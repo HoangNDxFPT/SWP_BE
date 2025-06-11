@@ -22,7 +22,7 @@ public class CourseService {
 
     public Course getCourseById(Long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElse(null);
     }
     public Course create(Course course) {
         return courseRepository.save(course);
@@ -38,7 +38,7 @@ public class CourseService {
             existing.setType(course.getType());
             existing.setUrl(course.getUrl());
             return courseRepository.save(existing);
-        }).orElseThrow(() -> new RuntimeException("Course not found"));
+        }).orElse(null);
     }
 
     public void delete(Long id) {
