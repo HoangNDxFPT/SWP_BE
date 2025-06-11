@@ -51,5 +51,11 @@ public class AuthenticationController {
         return ResponseEntity.ok("Password has been reset successfully.");
     }
 
+    @SecurityRequirement(name = "api")
+    @PostMapping("/api/logout")
+    public ResponseEntity<?> logout() {
+        // Client sẽ tự xóa token, backend chỉ phản hồi xác nhận
+        return ResponseEntity.ok("Logout successfully!");
+    }
 
 }
