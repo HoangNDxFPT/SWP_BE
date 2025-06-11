@@ -1,4 +1,4 @@
-package com.example.druguseprevention.api;
+package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.User;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin("*")// cho phép tất cả truy cập
-public class AuthenticationAPI {
+public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;

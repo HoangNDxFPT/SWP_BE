@@ -1,4 +1,4 @@
-package com.example.druguseprevention.api;
+package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.entity.Course;
 import com.example.druguseprevention.service.CourseService;
