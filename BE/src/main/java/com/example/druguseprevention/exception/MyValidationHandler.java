@@ -26,4 +26,9 @@ public class MyValidationHandler {
 
         return new ResponseEntity(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }
