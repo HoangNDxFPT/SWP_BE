@@ -1,4 +1,4 @@
-package com.example.druguseprevention.api;
+package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.User;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin("*")// cho phép tất cả truy cập
-public class AuthenticationAPI {
+public class AuthenticationController {
 
     @Autowired
     AuthenticationService authenticationService;
@@ -51,5 +51,11 @@ public class AuthenticationAPI {
         return ResponseEntity.ok("Password has been reset successfully.");
     }
 
+    @SecurityRequirement(name = "api")
+    @PostMapping("/api/logout")
+    public ResponseEntity<?> logout() {
+        // Client sẽ tự xóa token, backend chỉ phản hồi xác nhận
+        return ResponseEntity.ok("Logout successfully!");
+    }
 
 }

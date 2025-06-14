@@ -22,7 +22,27 @@ public class CourseService {
 
     public Course getCourseById(Long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Course not found with id: " + id));
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+    }
+    public Course create(Course course) {
+        return courseRepository.save(course);
+    }
+
+    public Course update(Long id, Course course) {
+        return courseRepository.findById(id).map(existing -> {
+            existing.setName(course.getName());
+            existing.setDescription(course.getDescription());
+            existing.setStartDate(course.getStartDate());
+            existing.setEndDate(course.getEndDate());
+            existing.setTargetAgeGroup(course.getTargetAgeGroup());
+            existing.setType(course.getType());
+            existing.setUrl(course.getUrl());
+            return courseRepository.save(existing);
+        }).orElseThrow(() -> new RuntimeException("Course not found"));
+    }
+
+    public void delete(Long id) {
+        courseRepository.deleteById(id);
     }
 
 }

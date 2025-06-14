@@ -2,14 +2,12 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.ProfileDTO;
 import com.example.druguseprevention.entity.User;
-import com.example.druguseprevention.enums.Gender;
-import com.example.druguseprevention.repository.AuthenticationRepository;
 import com.example.druguseprevention.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -30,15 +28,8 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        ProfileDTO dto = new ProfileDTO();
-        dto.setFullName(user.getFullName());
-        dto.setPhoneNumber(user.getPhoneNumber());
-        dto.setAddress(user.getAddress());
-        dto.setDateOfBirth(user.getDateOfBirth());
-        dto.setGender(user.getGender());
-        return dto;
+        return convertToProfileDTO(user);
     }
-
 
     public void updateProfile(ProfileDTO dto) {
         User user = getCurrentUser();
@@ -48,7 +39,6 @@ public class UserService {
         if (dto.getDateOfBirth() != null) {
             user.setDateOfBirth(dto.getDateOfBirth());
         }
-
         if (dto.getGender() != null) {
             user.setGender(dto.getGender());
         }
@@ -56,10 +46,18 @@ public class UserService {
     }
 
     public ProfileDTO getProfile() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = getCurrentUser();
+        return convertToProfileDTO(user);
+    }
 
+    public List<ProfileDTO> getAllProfiles() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
+                .map(this::convertToProfileDTO)
+                .collect(Collectors.toList());
+    }
+
+    private ProfileDTO convertToProfileDTO(User user) {
         ProfileDTO dto = new ProfileDTO();
         dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
@@ -68,5 +66,11 @@ public class UserService {
         dto.setGender(user.getGender());
         return dto;
     }
-}
+    public void deleteUserById(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
+    }
 
+}
