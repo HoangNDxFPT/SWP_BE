@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
@@ -27,19 +30,30 @@ public class TokenService {
     }
 
     public String generateToken(User user) {
-        String token =
-                // create object of JWT
-                Jwts.builder().
-                        //subject of token
-                                subject(user.getUsername()).
-                        // time Create Token
-                                issuedAt(new Date(System.currentTimeMillis()))
-                        // Time exprire of Token
-                        .expiration(new Date(System.currentTimeMillis()+24*60*60*1000))
-                        //
-                        .signWith(getSigninKey())
-                        .compact();
-        return token;
+//        String token =
+//                // create object of JWT
+//                Jwts.builder().
+//                        //subject of token
+//                         subject(user.getUsername()).
+//
+//                        // time Create Token
+//                        issuedAt(new Date(System.currentTimeMillis()))
+//                        // Time exprire of Token
+//                        .expiration(new Date(System.currentTimeMillis()+24*60*60*1000))
+//                        //
+//                        .signWith(getSigninKey())
+//                        .compact();
+//        return token;
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", List.of("ROLE_" + user.getRole())); // Đảm bảo ROLE_ prefix
+
+        return Jwts.builder()
+                .setClaims(claims) // gán các claims
+                .setSubject(user.getUsername()) // userName
+                .setIssuedAt(new Date(System.currentTimeMillis())) // thời điểm phát hành
+                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 24h
+                .signWith(getSigninKey()) // key ký JWT
+                .compact();
     }
 
     // form token to Claim Object

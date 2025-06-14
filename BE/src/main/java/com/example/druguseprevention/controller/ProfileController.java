@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.ProfileDTO;
 import com.example.druguseprevention.service.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/profile")
