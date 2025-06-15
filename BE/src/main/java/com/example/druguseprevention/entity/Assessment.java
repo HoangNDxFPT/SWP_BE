@@ -10,7 +10,7 @@ public class Assessment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @ManyToOne
     private User user;
@@ -25,11 +25,11 @@ public class Assessment {
 
     // Getter và Setter đầy đủ
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
