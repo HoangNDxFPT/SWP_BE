@@ -13,9 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
-public class EnrollmentService {
+public abstract class EnrollmentService {
     @Autowired
     private EnrollmentRepository enrollmentRepository;
 
@@ -45,4 +46,8 @@ public class EnrollmentService {
 
         return enrollmentRepository.save(enrollment);
     }
+
+    public abstract Enrollment enrollUserInCourse(User user, Course course);
+
+    public abstract List<Enrollment> getEnrollmentsByUser(User user);
 }
