@@ -14,5 +14,5 @@ public interface ConsultantService {
     void updateProfile(Long consultantId, ConsultantProfileDto profile);  // CN06
     ConsultationStatisticsDto getStatistics(Long consultantId);           // CN07
     void updateAppointmentStatus(Long id, UpdateAppointmentStatusDto statusDto);
-
+    Long getUserIdByUsername(String username);
 }

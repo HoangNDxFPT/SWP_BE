@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 @RestController
 @RequestMapping("/api/consultant")
 @RequiredArgsConstructor
@@ -15,76 +17,79 @@ public class ConsultantController {
 
     private final ConsultantService consultantService;
 
-    @GetMapping("/dashboard/{consultantId}")
-    public ResponseEntity<ConsultantDashboardDto> getDashboard(@PathVariable Long consultantId) {
-        return ResponseEntity.ok(consultantService.getDashboard(consultantId));
+    // ✅ Lấy userId từ token (username nằm trong token)
+    private Long getCurrentUserId() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return consultantService.getUserIdByUsername(username);
     }
 
-    @GetMapping("/appointments/{consultantId}")
-    public ResponseEntity<List<AppointmentDto>> getAppointments(@PathVariable Long consultantId) {
-        return ResponseEntity.ok(consultantService.getAppointments(consultantId));
+    // CN01: Dashboard tổng quan
+    @GetMapping("/dashboard")
+    public ResponseEntity<ConsultantDashboardDto> getDashboard() {
+        return ResponseEntity.ok(consultantService.getDashboard(getCurrentUserId()));
     }
 
+    // CN02: Xem danh sách lịch hẹn
+    @GetMapping("/appointments")
+    public ResponseEntity<List<AppointmentDto>> getAppointments() {
+        return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
+    }
+
+    // CN02: Xác nhận cuộc hẹn
     @PutMapping("/appointments/{id}/confirm")
     public ResponseEntity<Void> confirmAppointment(@PathVariable Long id) {
         consultantService.confirmAppointment(id);
         return ResponseEntity.ok().build();
     }
 
+    // CN02: Từ chối cuộc hẹn
     @PutMapping("/appointments/{id}/reject")
     public ResponseEntity<Void> rejectAppointment(@PathVariable Long id) {
         consultantService.rejectAppointment(id);
         return ResponseEntity.ok().build();
     }
 
+    // CN04: Xem phân tích khảo sát của user
     @GetMapping("/survey-analysis/{userId}")
     public ResponseEntity<List<SurveyAnalysisDto>> getSurveyAnalysis(@PathVariable Long userId) {
         return ResponseEntity.ok(consultantService.getSurveyAnalysis(userId));
     }
+
     // CN03: Ghi chú hồ sơ người dùng
     @PutMapping("/user/{userId}/note")
-    public ResponseEntity<Void> updateUserNote(
-            @PathVariable Long userId,
-            @RequestBody String note
-    ) {
+    public ResponseEntity<Void> updateUserNote(@PathVariable Long userId, @RequestBody String note) {
         consultantService.updateUserNote(userId, note);
         return ResponseEntity.ok().build();
     }
 
-    // CN05: Gợi ý hành động can thiệp cho người dùng
+    // CN05: Gợi ý hành động can thiệp
     @PostMapping("/user/{userId}/suggestion")
     public ResponseEntity<Void> suggestAction(
             @PathVariable Long userId,
-            @RequestBody ConsultantSuggestionDto suggestionDto
-    ) {
+            @RequestBody ConsultantSuggestionDto suggestionDto) {
         consultantService.suggestAction(userId, suggestionDto);
         return ResponseEntity.ok().build();
     }
 
-    // CN06: Quản lý thông tin cá nhân & lịch làm việc (của chính consultant)
-    @PutMapping("/profile/{consultantId}")
-    public ResponseEntity<Void> updateConsultantProfile(
-            @PathVariable Long consultantId,
-            @RequestBody ConsultantProfileDto profileDto
-    ) {
-        consultantService.updateProfile(consultantId, profileDto); //
+    // CN06: Cập nhật hồ sơ tư vấn viên (dùng token)
+    @PutMapping("/profile")
+    public ResponseEntity<Void> updateConsultantProfile(@RequestBody ConsultantProfileDto profileDto) {
+        consultantService.updateProfile(getCurrentUserId(), profileDto);
         return ResponseEntity.ok().build();
     }
 
-    // CN07: Thống kê tư vấn & phản hồi
-    @GetMapping("/statistics/{consultantId}")
-    public ResponseEntity<ConsultationStatisticsDto> getStatistics(
-            @PathVariable Long consultantId
-    ) {
-        return ResponseEntity.ok(consultantService.getStatistics(consultantId));
+    // CN07: Thống kê tư vấn (dùng token)
+    @GetMapping("/statistics")
+    public ResponseEntity<ConsultationStatisticsDto> getStatistics() {
+        return ResponseEntity.ok(consultantService.getStatistics(getCurrentUserId()));
     }
+
+    // CN02: Cập nhật trạng thái và ghi chú cuộc hẹn
     @PutMapping("/appointments/{id}/status")
     public ResponseEntity<Void> updateAppointmentStatus(
             @PathVariable Long id,
-            @RequestBody UpdateAppointmentStatusDto statusDto
-    ) {
+            @RequestBody UpdateAppointmentStatusDto statusDto) {
         consultantService.updateAppointmentStatus(id, statusDto);
         return ResponseEntity.ok().build();
     }
-
 }

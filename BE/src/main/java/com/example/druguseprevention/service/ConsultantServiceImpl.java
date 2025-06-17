@@ -72,6 +72,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             return dto;
         }).collect(Collectors.toList());
     }
+
     @Override // CN03: Ghi chú vào hồ sơ người dùng (ví dụ lưu vào note của các appointment chưa completed)
     public void updateUserNote(Long userId, String note) {
         List<Appointment> appointments = appointmentRepository.findByUserId(userId);
@@ -115,6 +116,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         dto.setFeedbackCount((int) (completed * 0.8)); // giả định 80% có feedback
         return dto;
     }
+
     @Override
     public void updateAppointmentStatus(Long id, UpdateAppointmentStatusDto statusDto) {
         Appointment appointment = appointmentRepository.findById(id)
@@ -127,6 +129,13 @@ public class ConsultantServiceImpl implements ConsultantService {
         }
 
         appointmentRepository.save(appointment);
+    }
+
+    @Override
+    public Long getUserIdByUsername(String username) {
+        return userRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"))
+                .getId();
     }
 
 }
