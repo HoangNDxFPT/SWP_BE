@@ -2,6 +2,7 @@ package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.service.ConsultantService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
-
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/api/consultant")
 @RequiredArgsConstructor
