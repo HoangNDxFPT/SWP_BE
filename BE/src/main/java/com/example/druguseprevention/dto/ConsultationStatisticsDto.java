@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ConsultationStatisticsDto {
-    private long totalAppointments;
-    private long completedAppointments;
+    private int totalAppointments;
+    private int completedAppointments;
     private int feedbackCount;
 }

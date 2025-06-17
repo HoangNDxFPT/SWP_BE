@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+@SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/api/consultant")

@@ -112,7 +112,7 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         ConsultationStatisticsDto dto = new ConsultationStatisticsDto();
         dto.setTotalAppointments(all.size());
-        dto.setCompletedAppointments(completed);
+        dto.setCompletedAppointments((int) completed);
         dto.setFeedbackCount((int) (completed * 0.8)); // giả định 80% có feedback
         return dto;
     }
