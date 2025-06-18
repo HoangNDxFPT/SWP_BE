@@ -17,5 +17,6 @@ public interface ConsultantService {
 
     Long getUserIdByUsername(String username);
     void createAppointment(Long consultantId, CreateAppointmentDto dto); // CN08
+    void updateAppointmentNote(Long appointmentId, String note);  // CN09
 
 }

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 @SecurityRequirement(name = "api")
@@ -100,5 +101,14 @@ public class ConsultantController {
         consultantService.createAppointment(getCurrentUserId(), dto);
         return ResponseEntity.ok().build();
     }
+    @PutMapping("/appointments/{id}/note")
+    public ResponseEntity<Void> updateAppointmentNote(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body) {
+        String note = body.get("note");
+        consultantService.updateAppointmentNote(id, note);
+        return ResponseEntity.ok().build();
+    }
+
 
 }

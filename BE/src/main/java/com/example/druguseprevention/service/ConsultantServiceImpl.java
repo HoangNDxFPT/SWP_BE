@@ -155,6 +155,13 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         appointmentRepository.save(appointment);
     }
+    @Override
+    public void updateAppointmentNote(Long appointmentId, String note) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new RuntimeException("Appointment not found"));
+        appointment.setNote(note);
+        appointmentRepository.save(appointment);
+    }
 
 
 }
