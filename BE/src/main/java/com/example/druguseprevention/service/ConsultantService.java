@@ -1,4 +1,5 @@
 package com.example.druguseprevention.service;
+
 import com.example.druguseprevention.dto.*;
 
 import java.util.List;
@@ -16,7 +17,6 @@ public interface ConsultantService {
     void updateAppointmentStatus(Long id, UpdateAppointmentStatusDto statusDto);
 
     Long getUserIdByUsername(String username);
-    void createAppointment(Long consultantId, CreateAppointmentDto dto); // CN08
+    AppointmentCreatedResponseDto createAppointment(Long consultantId, CreateAppointmentDto dto); // ✅ sửa ở đây
     void updateAppointmentNote(Long appointmentId, String note);  // CN09
-
 }

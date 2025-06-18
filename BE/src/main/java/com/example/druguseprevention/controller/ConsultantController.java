@@ -96,11 +96,14 @@ public class ConsultantController {
         return ResponseEntity.ok().build();
     }
     // CN08: Tạo lịch hẹn với chuyên viên
+    // CN08: Tạo lịch hẹn với chuyên viên
     @PostMapping("/appointments")
-    public ResponseEntity<Void> createAppointment(@RequestBody CreateAppointmentDto dto) {
-        consultantService.createAppointment(getCurrentUserId(), dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<AppointmentCreatedResponseDto> createAppointment(
+            @RequestBody CreateAppointmentDto dto) {
+        Long consultantId = getCurrentUserId(); // từ token
+        return ResponseEntity.ok(consultantService.createAppointment(consultantId, dto));
     }
+
     @PutMapping("/appointments/{id}/note")
     public ResponseEntity<Void> updateAppointmentNote(
             @PathVariable Long id,

@@ -1,4 +1,5 @@
 package com.example.druguseprevention.service;
+
 import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.Appointment;
 import com.example.druguseprevention.entity.User;
@@ -23,12 +24,10 @@ public class ConsultantServiceImpl implements ConsultantService {
     public ConsultantDashboardDto getDashboard(Long consultantId) {
         ConsultantDashboardDto dto = new ConsultantDashboardDto();
         dto.setTotalAppointments(appointmentRepository.findByConsultantId(consultantId).size());
-        dto.setTotalAppointments(appointmentRepository.findByConsultantId(consultantId).size());
         dto.setConfirmed((int) appointmentRepository.countByConsultantIdAndStatus(consultantId, Appointment.Status.CONFIRMED));
         dto.setPending((int) appointmentRepository.countByConsultantIdAndStatus(consultantId, Appointment.Status.PENDING));
         dto.setRejected((int) appointmentRepository.countByConsultantIdAndStatus(consultantId, Appointment.Status.REJECTED));
         dto.setCompleted((int) appointmentRepository.countByConsultantIdAndStatus(consultantId, Appointment.Status.COMPLETED));
-
         return dto;
     }
 
@@ -73,7 +72,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         }).collect(Collectors.toList());
     }
 
-    @Override // CN03: Ghi chú vào hồ sơ người dùng (ví dụ lưu vào note của các appointment chưa completed)
+    @Override
     public void updateUserNote(Long userId, String note) {
         List<Appointment> appointments = appointmentRepository.findByUserId(userId);
         appointments.forEach(app -> {
@@ -84,7 +83,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.saveAll(appointments);
     }
 
-    @Override // CN05: Gợi ý hành động can thiệp (giả định lưu như một appointment note)
+    @Override
     public void suggestAction(Long userId, ConsultantSuggestionDto suggestionDto) {
         List<Appointment> appointments = appointmentRepository.findByUserId(userId);
         appointments.forEach(app -> {
@@ -95,7 +94,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.saveAll(appointments);
     }
 
-    @Override // CN06: Cập nhật hồ sơ cá nhân & thời gian làm việc
+    @Override
     public void updateProfile(Long consultantId, ConsultantProfileDto profileDto) {
         User consultant = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
@@ -105,7 +104,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         userRepository.save(consultant);
     }
 
-    @Override // CN07: Thống kê tư vấn & phản hồi
+    @Override
     public ConsultationStatisticsDto getStatistics(Long consultantId) {
         List<Appointment> all = appointmentRepository.findByConsultantId(consultantId);
         long completed = all.stream().filter(a -> a.getStatus() == Appointment.Status.COMPLETED).count();
@@ -113,7 +112,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         ConsultationStatisticsDto dto = new ConsultationStatisticsDto();
         dto.setTotalAppointments(all.size());
         dto.setCompletedAppointments((int) completed);
-        dto.setFeedbackCount((int) (completed * 0.8)); // giả định 80% có feedback
+        dto.setFeedbackCount((int) (completed * 0.8)); // giả định 80% có phản hồi
         return dto;
     }
 
@@ -137,8 +136,9 @@ public class ConsultantServiceImpl implements ConsultantService {
                 .orElseThrow(() -> new RuntimeException("User not found"))
                 .getId();
     }
+
     @Override
-    public void createAppointment(Long consultantId, CreateAppointmentDto dto) {
+    public AppointmentCreatedResponseDto createAppointment(Long consultantId, CreateAppointmentDto dto) {
         User consultant = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
 
@@ -153,8 +153,20 @@ public class ConsultantServiceImpl implements ConsultantService {
                 .user(user)
                 .build();
 
-        appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+
+        // Trả về thông tin chi tiết cho FE
+        AppointmentCreatedResponseDto response = new AppointmentCreatedResponseDto();
+        response.setAppointmentId(saved.getId());
+        response.setFullName(user.getFullName());
+        response.setEmail(user.getEmail());
+        response.setPhoneNumber(user.getPhoneNumber());
+        response.setAppointmentTime(saved.getAppointmentTime());
+        response.setNote(saved.getNote());
+
+        return response;
     }
+
     @Override
     public void updateAppointmentNote(Long appointmentId, String note) {
         Appointment appointment = appointmentRepository.findById(appointmentId)
@@ -162,6 +174,4 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointment.setNote(note);
         appointmentRepository.save(appointment);
     }
-
-
 }
