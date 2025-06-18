@@ -145,6 +145,12 @@ public class ConsultantServiceImpl implements ConsultantService {
         User user = userRepository.findById((long) dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // Cập nhật tên người dùng nếu FE có nhập
+        if (dto.getFullName() != null && !dto.getFullName().isBlank()) {
+            user.setFullName(dto.getFullName());
+            userRepository.save(user);
+        }
+
         Appointment appointment = Appointment.builder()
                 .appointmentTime(dto.getAppointmentTime())
                 .note(dto.getNote())
@@ -155,10 +161,9 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         Appointment saved = appointmentRepository.save(appointment);
 
-        // Trả về thông tin chi tiết cho FE
         AppointmentCreatedResponseDto response = new AppointmentCreatedResponseDto();
         response.setAppointmentId(saved.getId());
-        response.setFullName(user.getFullName());
+        response.setFullName(user.getFullName()); // FE gửi và được trả lại
         response.setEmail(user.getEmail());
         response.setPhoneNumber(user.getPhoneNumber());
         response.setAppointmentTime(saved.getAppointmentTime());
@@ -166,6 +171,7 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         return response;
     }
+
 
     @Override
     public void updateAppointmentNote(Long appointmentId, String note) {
