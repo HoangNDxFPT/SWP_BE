@@ -16,4 +16,6 @@ public interface ConsultantService {
     void updateAppointmentStatus(Long id, UpdateAppointmentStatusDto statusDto);
 
     Long getUserIdByUsername(String username);
+    void createAppointment(Long consultantId, CreateAppointmentDto dto); // CN08
+
 }

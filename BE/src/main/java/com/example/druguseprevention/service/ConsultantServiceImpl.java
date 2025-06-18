@@ -137,5 +137,24 @@ public class ConsultantServiceImpl implements ConsultantService {
                 .orElseThrow(() -> new RuntimeException("User not found"))
                 .getId();
     }
+    @Override
+    public void createAppointment(Long consultantId, CreateAppointmentDto dto) {
+        User consultant = userRepository.findById(consultantId)
+                .orElseThrow(() -> new RuntimeException("Consultant not found"));
+
+        User user = userRepository.findById((long) dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Appointment appointment = Appointment.builder()
+                .appointmentTime(dto.getAppointmentTime())
+                .note(dto.getNote())
+                .status(Appointment.Status.PENDING)
+                .consultant(consultant)
+                .user(user)
+                .build();
+
+        appointmentRepository.save(appointment);
+    }
+
 
 }

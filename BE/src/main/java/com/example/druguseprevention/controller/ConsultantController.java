@@ -94,4 +94,11 @@ public class ConsultantController {
         consultantService.updateAppointmentStatus(id, statusDto);
         return ResponseEntity.ok().build();
     }
+    // CN08: Tạo lịch hẹn với chuyên viên
+    @PostMapping("/appointments")
+    public ResponseEntity<Void> createAppointment(@RequestBody CreateAppointmentDto dto) {
+        consultantService.createAppointment(getCurrentUserId(), dto);
+        return ResponseEntity.ok().build();
+    }
+
 }
