@@ -73,6 +73,7 @@ public class UserService {
     // Convert từ Entity -> DTO
     private ProfileDTO convertToProfileDTO(User user) {
         ProfileDTO dto = new ProfileDTO();
+        dto.setUserId(user.getId());
         dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setAddress(user.getAddress());
@@ -80,4 +81,5 @@ public class UserService {
         dto.setGender(user.getGender());
         return dto;
     }
+
 }
