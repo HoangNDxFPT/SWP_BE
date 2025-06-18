@@ -2,11 +2,13 @@ package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.entity.Lesson;
 import com.example.druguseprevention.service.LessonService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@SecurityRequirement(name = "api")
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/api/lessons")
 public class LessonController {

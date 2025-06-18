@@ -1,7 +1,7 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.entity.Course;
-import com.example.druguseprevention.service.CourseService;
+import com.example.druguseprevention.service.CourseServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseController {
 
-    private final CourseService courseService;
+    private final CourseServiceImpl courseService;
     @SecurityRequirement(name = "api")
     @GetMapping
     public ResponseEntity<List<Course>> getCourses(@RequestParam(required = false) String name) {

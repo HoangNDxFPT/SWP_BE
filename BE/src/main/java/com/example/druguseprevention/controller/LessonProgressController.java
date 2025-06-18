@@ -3,11 +3,13 @@ package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.entity.LessonProgress;
 import com.example.druguseprevention.service.LessonProgressService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@SecurityRequirement(name = "api")
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/api/progress")
 public class LessonProgressController {
