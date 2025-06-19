@@ -19,4 +19,6 @@ public interface ConsultantService {
     Long getUserIdByUsername(String username);
     AppointmentCreatedResponseDto createAppointment(Long consultantId, CreateAppointmentDto dto); // ✅ sửa ở đây
     void updateAppointmentNote(Long appointmentId, String note);  // CN09
+
+    List<UserProfileDto> getAllMemberProfiles();
 }

@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.Appointment;
 import com.example.druguseprevention.entity.ConsultantDetail;
 import com.example.druguseprevention.entity.User;
+import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.ConsultantDetailRepository;
 import com.example.druguseprevention.repository.SurveyResultRepository;
@@ -195,4 +196,25 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointment.setNote(note);
         appointmentRepository.save(appointment);
     }
+    @Override
+    public List<UserProfileDto> getAllMemberProfiles() {
+        return userRepository.findByRoleAndDeletedFalse(Role.MEMBER) // ✅ lọc đúng role MEMBER
+                .stream()
+                .map(user -> {
+                    UserProfileDto dto = new UserProfileDto();
+                    dto.setId(user.getId());
+                    dto.setEmail(user.getEmail());
+                    dto.setFullName(user.getFullName());
+                    dto.setPhoneNumber(user.getPhoneNumber());
+                    dto.setAddress(user.getAddress());
+                    dto.setDateOfBirth(user.getDateOfBirth());
+                    dto.setGender(user.getGender());
+                    dto.setRole(user.getRole());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
 }

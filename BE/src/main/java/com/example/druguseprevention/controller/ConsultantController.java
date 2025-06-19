@@ -112,6 +112,12 @@ public class ConsultantController {
         consultantService.updateAppointmentNote(id, note);
         return ResponseEntity.ok().build();
     }
+    // CN10: Lấy danh sách tất cả người dùng (role = MEMBER)
+    @GetMapping("/all-profiles")
+    public ResponseEntity<List<UserProfileDto>> getAllMemberProfiles() {
+        return ResponseEntity.ok(consultantService.getAllMemberProfiles());
+    }
+
 
 
 }
