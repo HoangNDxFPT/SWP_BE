@@ -43,4 +43,9 @@ public class CourseController {
         courseService.delete(id);
         return ResponseEntity.ok("Đã xóa khóa học");
     }
+    @SecurityRequirement(name = "api")
+    @GetMapping("/list")
+    public List<Course> getCourseList() {
+        return courseService.getCourseList();
+    }
 }

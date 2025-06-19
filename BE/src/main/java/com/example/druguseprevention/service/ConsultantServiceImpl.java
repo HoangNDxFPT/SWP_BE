@@ -2,8 +2,10 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.Appointment;
+import com.example.druguseprevention.entity.ConsultantDetail;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.AppointmentRepository;
+import com.example.druguseprevention.repository.ConsultantDetailRepository;
 import com.example.druguseprevention.repository.SurveyResultRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ public class ConsultantServiceImpl implements ConsultantService {
     private final AppointmentRepository appointmentRepository;
     private final SurveyResultRepository surveyResultRepository;
     private final UserRepository userRepository;
+    private final ConsultantDetailRepository consultantDetailRepository;
 
     @Override
     public ConsultantDashboardDto getDashboard(Long consultantId) {
@@ -94,14 +97,28 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.saveAll(appointments);
     }
 
+    // ✅ CN06: Cập nhật hồ sơ tư vấn viên (User + ConsultantDetail)
     @Override
-    public void updateProfile(Long consultantId, ConsultantProfileDto profileDto) {
-        User consultant = userRepository.findById(consultantId)
+    public void updateProfile(Long consultantId, ConsultantProfileDto dto) {
+        // Cập nhật thông tin User
+        User user = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
-        consultant.setFullName(profileDto.getFullName());
-        consultant.setPhoneNumber(profileDto.getPhoneNumber());
-        consultant.setAddress(profileDto.getAddress());
-        userRepository.save(consultant);
+        user.setFullName(dto.getFullName());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+        userRepository.save(user);
+
+        // Cập nhật hoặc tạo mới ConsultantDetail
+        ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
+        if (detail == null) {
+            detail = new ConsultantDetail();
+            detail.setConsultantId(consultantId);
+            detail.setUser(user);
+        }
+        detail.setStatus(dto.getStatus());
+        detail.setDegree(dto.getDegree());
+        detail.setInformation(dto.getInformation());
+        consultantDetailRepository.save(detail);
     }
 
     @Override
@@ -145,7 +162,6 @@ public class ConsultantServiceImpl implements ConsultantService {
         User user = userRepository.findById((long) dto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Cập nhật tên người dùng nếu FE có nhập
         if (dto.getFullName() != null && !dto.getFullName().isBlank()) {
             user.setFullName(dto.getFullName());
             userRepository.save(user);
@@ -163,7 +179,7 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         AppointmentCreatedResponseDto response = new AppointmentCreatedResponseDto();
         response.setAppointmentId(saved.getId());
-        response.setFullName(user.getFullName()); // FE gửi và được trả lại
+        response.setFullName(user.getFullName());
         response.setEmail(user.getEmail());
         response.setPhoneNumber(user.getPhoneNumber());
         response.setAppointmentTime(saved.getAppointmentTime());
@@ -171,7 +187,6 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         return response;
     }
-
 
     @Override
     public void updateAppointmentNote(Long appointmentId, String note) {

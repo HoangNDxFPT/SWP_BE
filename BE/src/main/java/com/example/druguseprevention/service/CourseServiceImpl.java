@@ -50,4 +50,8 @@ public class CourseServiceImpl {
         course.setIsDeleted(true);
         courseRepository.save(course); // chỉ đánh dấu, không xóa thật
     }
+    public List<Course> getCourseList() {
+        return courseRepository.findAll();
+    }
+
 }

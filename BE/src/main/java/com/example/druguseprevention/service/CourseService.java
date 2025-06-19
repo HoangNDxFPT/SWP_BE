@@ -10,4 +10,5 @@ public interface CourseService {
     Course update(Long id, Course course);
     void delete(Long id);
     //Course restore(Long id); // nếu có chức năng khôi phục
+
 }
