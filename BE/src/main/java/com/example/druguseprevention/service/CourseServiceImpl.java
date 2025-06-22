@@ -9,10 +9,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class CourseServiceImpl {
+public class CourseServiceImpl implements CourseService {
 
     private final CourseRepository courseRepository;
 
+    @Override
     public List<Course> getCourses(String name) {
         if (name != null && !name.isEmpty()) {
             return courseRepository.findByNameContainingIgnoreCaseAndIsDeletedFalse(name);
@@ -20,17 +21,20 @@ public class CourseServiceImpl {
         return courseRepository.findByIsDeletedFalse();
     }
 
+    @Override
     public Course getCourseById(Long id) {
         return courseRepository.findById(id)
                 .filter(course -> !course.isDeleted()) // đảm bảo không lấy khóa học đã bị xóa
                 .orElse(null);
     }
 
+    @Override
     public Course create(Course course) {
         course.setIsDeleted(false); // mặc định chưa xóa
         return courseRepository.save(course);
     }
 
+    @Override
     public Course update(Long id, Course course) {
         return courseRepository.findById(id).filter(c -> !c.isDeleted()).map(existing -> {
             existing.setName(course.getName());
@@ -44,14 +48,17 @@ public class CourseServiceImpl {
         }).orElse(null);
     }
 
+    @Override
     public void delete(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy khóa học"));
         course.setIsDeleted(true);
         courseRepository.save(course); // chỉ đánh dấu, không xóa thật
     }
-    public List<Course> getCourseList() {
-        return courseRepository.findAll();
-    }
 
+    @Override
+    public List<Course> getCourseList() {
+        // Sửa lại method này để chỉ trả về khóa học chưa xóa
+        return courseRepository.findByIsDeletedFalse();
+    }
 }

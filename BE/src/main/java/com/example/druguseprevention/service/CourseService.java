@@ -9,6 +9,5 @@ public interface CourseService {
     Course create(Course course);
     Course update(Long id, Course course);
     void delete(Long id);
-    //Course restore(Long id); // nếu có chức năng khôi phục
-
+    List<Course> getCourseList();
 }
