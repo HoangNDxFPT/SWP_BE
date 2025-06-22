@@ -51,7 +51,8 @@ public class CourseServiceImpl {
         courseRepository.save(course); // chỉ đánh dấu, không xóa thật
     }
     public List<Course> getCourseList() {
-        return courseRepository.findAll();
+        return courseRepository.findByIsDeletedFalse(); // Chỉ lấy khóa học chưa bị xóa
     }
 
 }
+
