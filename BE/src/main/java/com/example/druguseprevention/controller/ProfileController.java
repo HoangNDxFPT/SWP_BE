@@ -30,20 +30,42 @@ public class ProfileController {
         return ResponseEntity.ok(userService.getProfile());
     }
 
-    @PatchMapping
-    public ResponseEntity<?> updateProfile(@RequestBody ProfileDTO dto) {
-        userService.updateProfile(dto);
-        return ResponseEntity.ok("Updated");
+    // Người dùng thường cập nhật profile
+    @PatchMapping("/update-self")
+    public ResponseEntity<String> updateOwnProfile(@RequestBody ProfileDTO profileDTO) {
+        userService.updateProfile(profileDTO);
+        return ResponseEntity.ok("Profile updated successfully");
     }
+
+    // Admin cập nhật profile người dùng
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/admin-update")
+    public ResponseEntity<String> adminUpdateProfile(@RequestBody AdminProfileDTO profileDTO) {
+        userService.updateProfile(profileDTO);
+        return ResponseEntity.ok("Profile updated successfully");
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/{id}/password")
+    public ResponseEntity<String> resetUserPassword(
+            @PathVariable Long id,
+            @RequestBody ChangePasswordRequest request) {
+
+        userService.updatePassword(id, request);
+        return ResponseEntity.ok("Password reset successfully");
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ProfileDTO> getProfileById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getProfileById(id));
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
-    public ResponseEntity<List<ProfileDTO>> getAllProfiles() {
+    public ResponseEntity<List<AdminProfileDTO>> getAllProfiles() {  // Thay List<ProfileDTO> bằng List<AdminProfileDTO>
         return ResponseEntity.ok(userService.getAllProfiles());
     }
+
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProfile(@PathVariable Long id) {
