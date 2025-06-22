@@ -18,12 +18,14 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    // Lấy user hiện tại đang đăng nhập
     public User getCurrentUser() {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUserName(userName)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
+    // Lấy profile theo ID
     public ProfileDTO getProfileById(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -31,6 +33,7 @@ public class UserService {
         return convertToProfileDTO(user);
     }
 
+    // Cập nhật thông tin profile của người dùng hiện tại
     public void updateProfile(ProfileDTO dto) {
         User user = getCurrentUser();
         user.setFullName(dto.getFullName());
@@ -45,32 +48,38 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // Lấy profile của người dùng hiện tại
     public ProfileDTO getProfile() {
         User user = getCurrentUser();
         return convertToProfileDTO(user);
     }
 
+    // Lấy danh sách profile của các user chưa bị xóa (deleted = false)
     public List<ProfileDTO> getAllProfiles() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findByDeletedFalse(); // lọc deleted = false
         return users.stream()
                 .map(this::convertToProfileDTO)
                 .collect(Collectors.toList());
     }
 
+    // Xóa mềm user (chỉ đặt deleted = true)
+    public void deleteUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        user.setDeleted(true); // soft delete
+        userRepository.save(user);
+    }
+
+    // Convert từ Entity -> DTO
     private ProfileDTO convertToProfileDTO(User user) {
         ProfileDTO dto = new ProfileDTO();
+        dto.setUserId(user.getId());
         dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setAddress(user.getAddress());
         dto.setDateOfBirth(user.getDateOfBirth());
         dto.setGender(user.getGender());
         return dto;
-    }
-    public void deleteUserById(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id: " + id);
-        }
-        userRepository.deleteById(id);
     }
 
 }

@@ -34,8 +34,14 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String url;
 
+    public void setIsDeleted(boolean b) {
+    }
+
     public enum TargetAgeGroup {
         Teenagers,
         Adults
     }
+    @Column(name = "is_deleted")
+    private boolean isDeleted = false;
+
 }

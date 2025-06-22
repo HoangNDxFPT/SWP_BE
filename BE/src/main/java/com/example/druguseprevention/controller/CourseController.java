@@ -1,9 +1,7 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.entity.Course;
-import com.example.druguseprevention.entity.Enrollment;
-import com.example.druguseprevention.service.CourseService;
-import com.example.druguseprevention.service.EnrollmentService;
+import com.example.druguseprevention.service.CourseServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseController {
 
-    private final CourseService courseService;
-    private final EnrollmentService enrollmentService;
-
+    private final CourseServiceImpl courseService;
     @SecurityRequirement(name = "api")
     @GetMapping
     public ResponseEntity<List<Course>> getCourses(@RequestParam(required = false) String name) {
@@ -47,11 +43,9 @@ public class CourseController {
         courseService.delete(id);
         return ResponseEntity.ok("Đã xóa khóa học");
     }
-
     @SecurityRequirement(name = "api")
-    @PostMapping("/{id}/enroll")
-    public ResponseEntity<?> enroll(@PathVariable Long id) {
-        Enrollment enrollment = enrollmentService.enrollUserToCourse(id);
-        return ResponseEntity.ok("Đã join khóa học");
+    @GetMapping("/list")
+    public List<Course> getCourseList() {
+        return courseService.getCourseList();
     }
 }
