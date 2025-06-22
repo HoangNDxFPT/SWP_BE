@@ -30,23 +30,20 @@ public class ProfileController {
         return ResponseEntity.ok(userService.getProfile());
     }
 
-    @PutMapping
+    @PatchMapping
     public ResponseEntity<?> updateProfile(@RequestBody ProfileDTO dto) {
         userService.updateProfile(dto);
         return ResponseEntity.ok("Updated");
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<ProfileDTO> getProfileById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getProfileById(id));
     }
-
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<ProfileDTO>> getAllProfiles() {
         return ResponseEntity.ok(userService.getAllProfiles());
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProfile(@PathVariable Long id) {

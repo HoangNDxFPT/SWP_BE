@@ -27,9 +27,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Arrays;
 import java.io.IOException;
-
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) //  Quan trọng: Kích hoạt @PreAuthorize
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
