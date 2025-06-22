@@ -39,12 +39,11 @@ public class ProfileController {
     public ResponseEntity<ProfileDTO> getProfileById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getProfileById(id));
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<ProfileDTO>> getAllProfiles() {
         return ResponseEntity.ok(userService.getAllProfiles());
     }
-
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteProfile(@PathVariable Long id) {
