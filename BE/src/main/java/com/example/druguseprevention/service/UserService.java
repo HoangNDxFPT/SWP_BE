@@ -157,20 +157,20 @@ public class UserService {
 
             user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         }
-        // Trường hợp 2: Người dùng thay đổi mật khẩu của chính họ
-        else {
-            // Người dùng cần cung cấp mật khẩu cũ và mới
-            if (request.getOldPassword() == null || request.getNewPassword() == null) {
-                throw new RuntimeException("Both old and new passwords are required");
-            }
-
-            // Xác thực mật khẩu cũ
-            if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-                throw new RuntimeException("Current password is incorrect");
-            }
-
-            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
-        }
+//        // Trường hợp 2: Người dùng thay đổi mật khẩu của chính họ
+//        else {
+//            // Người dùng cần cung cấp mật khẩu cũ và mới
+//            if (request.getOldPassword() == null || request.getNewPassword() == null) {
+//                throw new RuntimeException("Both old and new passwords are required");
+//            }
+//
+//            // Xác thực mật khẩu cũ
+//            if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+//                throw new RuntimeException("Current password is incorrect");
+//            }
+//
+//            user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+//        }
 
         userRepository.save(user);
     }
