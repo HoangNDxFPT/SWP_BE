@@ -41,7 +41,7 @@ public class ProfileController {
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/admin-update")
     public ResponseEntity<String> adminUpdateProfile(@RequestBody AdminProfileDTO profileDTO) {
-        userService.updateProfile(profileDTO);
+        userService.adminUpdateProfile(profileDTO);
         return ResponseEntity.ok("Profile updated successfully");
     }
 
