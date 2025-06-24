@@ -42,4 +42,5 @@ public class CourseQuizResultController {
         service.delete(id);
         return ResponseEntity.ok("Deleted");
     }
+
 }
