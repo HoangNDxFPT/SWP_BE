@@ -15,4 +15,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     // ✅ Thêm dòng này để tìm tất cả user có role = MEMBER
     List<User> findByRoleAndDeletedFalse(Role role);
+
 }
+
+

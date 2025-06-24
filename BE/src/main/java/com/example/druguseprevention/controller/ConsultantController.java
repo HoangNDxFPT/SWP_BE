@@ -1,6 +1,8 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.*;
+import com.example.druguseprevention.enums.Role;
+import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.ConsultantService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 @SecurityRequirement(name = "api")
@@ -19,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class ConsultantController {
 
     private final ConsultantService consultantService;
+    private final UserRepository userRepository;
 
     // ✅ Lấy userId từ token (username nằm trong token)
     private Long getCurrentUserId() {
@@ -117,6 +121,24 @@ public class ConsultantController {
     public ResponseEntity<List<UserProfileDto>> getAllMemberProfiles() {
         return ResponseEntity.ok(consultantService.getAllMemberProfiles());
     }
+    @GetMapping("/consultants")
+    public ResponseEntity<List<ConsultantProfileResponse>> getAllConsultants() {
+        return ResponseEntity.ok(
+                userRepository.findByRoleAndDeletedFalse(Role.CONSULTANT)
+                        .stream()
+                        .map(user -> ConsultantProfileResponse.builder()
+                                .id(user.getId())
+                                .fullName(user.getFullName())
+                                .email(user.getEmail())
+                                .phone(user.getPhoneNumber())
+                                .build())
+                        .collect(Collectors.toList())
+        );
+    }
+
+
+
+
 
 
 
