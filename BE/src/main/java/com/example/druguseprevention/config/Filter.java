@@ -1,7 +1,7 @@
 package com.example.druguseprevention.config;
 
 import com.example.druguseprevention.entity.User;
-import com.example.druguseprevention.exception.AuthenticationException;
+import com.example.druguseprevention.exception.exceptions.AuthenticationException;
 import com.example.druguseprevention.service.TokenService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

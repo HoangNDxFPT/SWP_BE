@@ -41,7 +41,7 @@ public class ProfileController {
         return ResponseEntity.ok(userService.getProfileById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/all")
     public ResponseEntity<List<ProfileDTO>> getAllProfiles() {
         return ResponseEntity.ok(userService.getAllProfiles());

@@ -2,6 +2,7 @@ package com.example.druguseprevention.entity;
 
 import com.example.druguseprevention.enums.Gender;
 import com.example.druguseprevention.enums.Role;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import jakarta.validation.constraints.*;
@@ -76,4 +77,8 @@ public class User implements UserDetails {
     public String getPassword() {
         return this.password;
     }
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Assessment> assessments;
 }
