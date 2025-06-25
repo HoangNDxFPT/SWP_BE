@@ -13,4 +13,5 @@ public class ProfileDTO {
     private String address;
     private LocalDate dateOfBirth;
     private Gender gender;
+//    private Role role;
 }

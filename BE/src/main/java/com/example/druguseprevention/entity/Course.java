@@ -34,7 +34,8 @@ public class Course {
     @Column(columnDefinition = "TEXT")
     private String url;
 
-    public void setIsDeleted(boolean b) {
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted; // Cập nhật giá trị trường
     }
 
     public enum TargetAgeGroup {
