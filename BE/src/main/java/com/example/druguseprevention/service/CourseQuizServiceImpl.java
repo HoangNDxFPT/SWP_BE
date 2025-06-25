@@ -50,6 +50,21 @@ public class CourseQuizServiceImpl implements CourseQuizService {
         dto.setId(quiz.getId());
         return dto;
     }
+    @Override
+    public CourseQuizDto updateQuiz(Long id, CourseQuizDto dto) {
+        CourseQuiz quiz = quizRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Quiz not found"));
+
+        // Only update fields that are provided
+        quiz.setQuestion(dto.getQuestion());
+        quiz.setAnswer(dto.getAnswer());
+        quiz.setCorrect(dto.getCorrect());
+
+        quiz = quizRepository.save(quiz);
+
+        dto.setId(quiz.getId());
+        return dto;
+    }
 
     @Override
     public void deleteQuiz(Long id) {

@@ -32,6 +32,11 @@ public class CourseQuizController {
         quizService.deleteQuiz(id);
     }
 
+    @PutMapping("/{id}")
+    public CourseQuizDto updateQuiz(@PathVariable Long id, @RequestBody CourseQuizDto dto) {
+        return quizService.updateQuiz(id, dto);
+    }
+
     // ✅ API: Lấy danh sách courseId đã hoàn thành (điểm >= 60%)
     @GetMapping("/completed/{userId}")
     public List<Long> getCompletedCourses(@PathVariable Long userId) {
