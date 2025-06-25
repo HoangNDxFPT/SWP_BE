@@ -1,9 +1,11 @@
 package com.example.druguseprevention.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "courses")
@@ -42,7 +44,14 @@ public class Course {
         Teenagers,
         Adults
     }
+
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
+
+
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<RecommendationCourse> recommendationCourses;
 }
+

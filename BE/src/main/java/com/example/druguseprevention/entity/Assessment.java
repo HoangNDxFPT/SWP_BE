@@ -1,67 +1,39 @@
 package com.example.druguseprevention.entity;
 
-import jakarta.persistence.*;
 
-import java.time.LocalDate;
+
+import com.example.druguseprevention.enums.AssessmentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "assessments") // Có thể đặt tên khác nếu cần
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Assessment {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Enumerated(EnumType.STRING)
+    private AssessmentType type;
 
-    @ManyToOne
-    private User user;
+    @ManyToOne @JoinColumn(name="member_id", nullable=false)
+    private User member;
 
-    @ManyToOne
-    private Course course;
+    private LocalDateTime createdAt;
 
-    @Lob
-    private String answers;
+    private boolean submitted = false;
 
-    private LocalDate submittedDate;
+    @OneToMany(mappedBy = "assessment", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<AssessmentResult> results;
 
-    // Getter và Setter đầy đủ
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Course getCourse() {
-        return course;
-    }
-
-    public void setCourse(Course course) {
-        this.course = course;
-    }
-
-    public String getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(String answers) {
-        this.answers = answers;
-    }
-
-    public LocalDate getSubmittedDate() {
-        return submittedDate;
-    }
-
-    public void setSubmittedDate(LocalDate submittedDate) {
-        this.submittedDate = submittedDate;
-    }
 }

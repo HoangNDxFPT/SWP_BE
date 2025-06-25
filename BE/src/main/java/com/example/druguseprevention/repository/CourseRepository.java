@@ -8,6 +8,12 @@ import java.util.List;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
+
     List<Course> findByIsDeletedFalse();
     List<Course> findByNameContainingIgnoreCaseAndIsDeletedFalse(String name);
+
+
+    List<Course> findByNameContainingIgnoreCase(String name);
+    List<Course> findByTargetAgeGroup(Course.TargetAgeGroup group);
 }
+

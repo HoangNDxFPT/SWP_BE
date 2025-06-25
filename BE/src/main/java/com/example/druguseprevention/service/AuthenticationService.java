@@ -3,7 +3,7 @@ package com.example.druguseprevention.service;
 import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Role;
-import com.example.druguseprevention.exception.AuthenticationException;
+import com.example.druguseprevention.exception.exceptions.AuthenticationException;
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +43,8 @@ public class AuthenticationService implements UserDetailsService {
     TemplateEngine templateEngine;
 
     public User register (RegisterRequest registerRequest){
-        User user = new User();
-        user.setUserName(registerRequest.getUserName());
+        User user = modelMapper.map(registerRequest, User.class);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setEmail(registerRequest.getEmail());
-        user.setFullName(registerRequest.getFullName());
-        user.setPhoneNumber(registerRequest.getPhoneNumber());
-        user.setAddress(registerRequest.getAddress());
-        user.setDateOfBirth(registerRequest.getDateOfBirth());
-        user.setGender(registerRequest.getGender());
         // Gán role mặc định là "Member"
         user.setRole(Role.MEMBER);
         // Send email
