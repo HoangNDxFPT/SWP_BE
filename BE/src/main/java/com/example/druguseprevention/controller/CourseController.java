@@ -1,6 +1,8 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.entity.Course;
+import com.example.druguseprevention.service.CourseServiceImpl;
+import com.example.druguseprevention.service.CourseQuizService;
 import com.example.druguseprevention.service.CourseService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseController {
 
+    private final CourseServiceImpl courseService;
+    private final CourseQuizService courseQuizService; // ✅ thêm
     private final CourseService courseService;
 
     @SecurityRequirement(name = "api")
@@ -54,4 +58,5 @@ public class CourseController {
     public List<Course> getCourseList() {
         return courseService.getCourseList();
     }
+
 }

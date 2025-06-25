@@ -3,9 +3,10 @@ package com.example.druguseprevention.service;
 import com.example.druguseprevention.dto.CourseQuizDto;
 import com.example.druguseprevention.entity.Course;
 import com.example.druguseprevention.entity.CourseQuiz;
+import com.example.druguseprevention.entity.CourseQuizResult;
 import com.example.druguseprevention.repository.CourseQuizRepository;
 import com.example.druguseprevention.repository.CourseRepository;
-import com.example.druguseprevention.service.CourseQuizService;
+import com.example.druguseprevention.repository.CourseQuizResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ public class CourseQuizServiceImpl implements CourseQuizService {
 
     private final CourseQuizRepository quizRepository;
     private final CourseRepository courseRepository;
+    private final CourseQuizResultRepository resultRepository; // ✅ injected
 
     @Override
     public List<CourseQuizDto> getQuizByCourseId(Long courseId) {
@@ -52,5 +54,16 @@ public class CourseQuizServiceImpl implements CourseQuizService {
     @Override
     public void deleteQuiz(Long id) {
         quizRepository.deleteById(id);
+    }
+
+    // ✅ Trả về danh sách ID khóa học mà user đã hoàn thành (điểm >= 60%)
+    @Override
+    public List<Long> getCompletedCourseIdsByUserId(Long userId) {
+        List<CourseQuizResult> results = resultRepository.findByUserId(userId);
+        return results.stream()
+                .filter(result -> result.getScore() >= 0.6 * result.getTotalQuestions())
+                .map(result -> result.getCourse().getId())
+                .distinct()
+                .toList();
     }
 }

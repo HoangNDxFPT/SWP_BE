@@ -58,7 +58,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> getCourseList() {
-        // Sửa lại method này để chỉ trả về khóa học chưa xóa
-        return courseRepository.findByIsDeletedFalse();
+        return courseRepository.findByIsDeletedFalse(); // Chỉ lấy khóa học chưa bị xóa
     }
+
 }
+
+
