@@ -47,6 +47,7 @@ public class AssessmentService {
 
     public AssessmentResultResponse convertToResponse(AssessmentResult result) {
         AssessmentResultResponse response = new AssessmentResultResponse();
+        response.setAssessmentResultId(result.getId());
         response.setAssessmentId(result.getAssessment().getId());
         response.setAssessmentType(result.getAssessment().getType());
         response.setScore(result.getScore());

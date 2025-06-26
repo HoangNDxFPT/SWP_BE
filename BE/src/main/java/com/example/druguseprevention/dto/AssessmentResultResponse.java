@@ -9,6 +9,7 @@ import java.util.List;
 
 @Data
 public class AssessmentResultResponse {
+    private Long assessmentResultId;
     private Long assessmentId;
     private AssessmentType assessmentType;
     private int score;

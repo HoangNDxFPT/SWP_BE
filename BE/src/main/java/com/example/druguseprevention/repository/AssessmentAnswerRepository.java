@@ -10,4 +10,5 @@ public interface AssessmentAnswerRepository extends JpaRepository<AssessmentAnsw
     List<AssessmentAnswer> findByQuestionId(Long questionId);
     List<AssessmentAnswer> findByIsDeletedFalse();
     Optional<AssessmentAnswer> findByIdAndIsDeletedFalse(Long id);
+    List<AssessmentAnswer> findByQuestionIdAndIsDeletedFalse(Long questionId);
 }
