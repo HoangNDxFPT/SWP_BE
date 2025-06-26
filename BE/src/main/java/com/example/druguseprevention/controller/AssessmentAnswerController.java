@@ -1,5 +1,6 @@
 package com.example.druguseprevention.controller;
 
+import com.example.druguseprevention.dto.AssessmentAnswerUpdateRequest;
 import com.example.druguseprevention.entity.AssessmentAnswer;
 import com.example.druguseprevention.service.AssessmentAnswerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -48,6 +49,14 @@ public class AssessmentAnswerController {
         } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PutMapping("/questions/{questionId}/answers")
+    public ResponseEntity<?> updateAnswersForQuestion(
+            @PathVariable Long questionId,
+            @RequestBody List<AssessmentAnswerUpdateRequest> answerRequests) {
+        answerService.updateAnswersByQuestionId(questionId, answerRequests);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")
