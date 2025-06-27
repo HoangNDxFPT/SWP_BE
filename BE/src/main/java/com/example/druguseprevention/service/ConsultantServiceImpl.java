@@ -214,6 +214,28 @@ public class ConsultantServiceImpl implements ConsultantService {
                 })
                 .collect(Collectors.toList());
     }
+    @Override
+    public ConsultantProfileDto getProfile(Long consultantId) {
+        User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
+
+        ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);// ✅ Lấy thông tin tư vấn
+
+        ConsultantProfileDto dto = new ConsultantProfileDto();
+        dto.setFullName(user.getFullName());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setAddress(user.getAddress());
+
+        if (detail != null) {
+            dto.setStatus(detail.getStatus());
+            dto.setDegree(detail.getDegree());
+            dto.setInformation(detail.getInformation());
+        }
+
+        return dto;
+    }
+
+
 
 
 

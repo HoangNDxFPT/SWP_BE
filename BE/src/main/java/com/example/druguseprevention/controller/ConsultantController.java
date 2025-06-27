@@ -134,6 +134,14 @@ public class ConsultantController {
                                 .build())
                         .collect(Collectors.toList())
         );
+
+    }
+        // CNxx: Lấy hồ sơ tư vấn viên đang đăng nhập
+        @GetMapping("/profile")
+        public ResponseEntity<ConsultantProfileDto> getConsultantProfile() {
+            return ResponseEntity.ok(consultantService.getProfile(getCurrentUserId()));
+        }
+
     }
 
 
@@ -142,4 +150,4 @@ public class ConsultantController {
 
 
 
-}
+

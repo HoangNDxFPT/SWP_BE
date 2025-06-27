@@ -21,4 +21,6 @@ public interface ConsultantService {
     void updateAppointmentNote(Long appointmentId, String note);  // CN09
 
     List<UserProfileDto> getAllMemberProfiles();
+    ConsultantProfileDto getProfile(Long consultantId);
+
 }
