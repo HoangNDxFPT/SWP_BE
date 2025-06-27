@@ -118,17 +118,17 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
     List<AssessmentQuestion> questions = assessmentQuestionRepository.findByAssessmentTypeAndIsDeletedFalseOrderByQuestionOrder(type);
 
 
-    List<AssessmentStartResponse.QuestionDTO> questionDtos = questions.stream().map(q -> {
+    List<AssessmentStartResponse.QuestionDTO> questionDtos = questions.stream().map(question -> {
         AssessmentStartResponse.QuestionDTO qDto = new AssessmentStartResponse.QuestionDTO();
-        qDto.setId(q.getId());
-        qDto.setQuestionText(q.getQuestionText());
+        qDto.setId(question.getId());
+        qDto.setQuestionText(question.getQuestionText());
 
-        List<AssessmentAnswer> answers = assessmentAnswerRepository.findByQuestionId(q.getId());
+        List<AssessmentAnswer> answers = assessmentAnswerRepository.findByQuestionIdAndIsDeletedFalse(question.getId());
         List<AssessmentStartResponse.AnswerDTO> answerDtos = answers.stream().map(a -> {
             AssessmentStartResponse.AnswerDTO aDto = new AssessmentStartResponse.AnswerDTO();
             aDto.setId(a.getId());
             aDto.setText(a.getAnswerText());
-//            aDto.setScore(a.getScore());
+//            aDto.setScore(a.getScore()); dùng để hiển thị điểm đáp án trên bài làm
             return aDto;
         }).toList();
 
