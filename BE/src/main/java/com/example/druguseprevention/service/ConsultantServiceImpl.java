@@ -98,10 +98,9 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.saveAll(appointments);
     }
 
-    // ✅ CN06: Cập nhật hồ sơ tư vấn viên (User + ConsultantDetail)
+    // ✅ Cập nhật hồ sơ tư vấn viên
     @Override
     public void updateProfile(Long consultantId, ConsultantProfileDto dto) {
-        // Cập nhật thông tin User
         User user = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
         user.setFullName(dto.getFullName());
@@ -109,17 +108,40 @@ public class ConsultantServiceImpl implements ConsultantService {
         user.setAddress(dto.getAddress());
         userRepository.save(user);
 
-        // Cập nhật hoặc tạo mới ConsultantDetail
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
         if (detail == null) {
             detail = new ConsultantDetail();
             detail.setConsultantId(consultantId);
             detail.setUser(user);
         }
+
         detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
         detail.setInformation(dto.getInformation());
+        detail.setCertifiedDegree(dto.getCertifiedDegree()); // ✅ Thêm certifiedDegree
         consultantDetailRepository.save(detail);
+    }
+
+    @Override
+    public ConsultantProfileDto getProfile(Long consultantId) {
+        User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
+
+        ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
+
+        ConsultantProfileDto dto = new ConsultantProfileDto();
+        dto.setFullName(user.getFullName());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setAddress(user.getAddress());
+
+        if (detail != null) {
+            dto.setStatus(detail.getStatus());
+            dto.setDegree(detail.getDegree());
+            dto.setInformation(detail.getInformation());
+            dto.setCertifiedDegree(detail.getCertifiedDegree()); // ✅ Lấy certifiedDegree
+        }
+
+        return dto;
     }
 
     @Override
@@ -196,9 +218,10 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointment.setNote(note);
         appointmentRepository.save(appointment);
     }
+
     @Override
     public List<UserProfileDto> getAllMemberProfiles() {
-        return userRepository.findByRoleAndDeletedFalse(Role.MEMBER) // ✅ lọc đúng role MEMBER
+        return userRepository.findByRoleAndDeletedFalse(Role.MEMBER)
                 .stream()
                 .map(user -> {
                     UserProfileDto dto = new UserProfileDto();
@@ -214,7 +237,4 @@ public class ConsultantServiceImpl implements ConsultantService {
                 })
                 .collect(Collectors.toList());
     }
-
-
-
 }
