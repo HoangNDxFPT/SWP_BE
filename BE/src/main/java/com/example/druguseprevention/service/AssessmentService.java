@@ -231,14 +231,8 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
 
 
         // 3. Xác định mức độ rủi ro dựa trên tổng điểm
-        RiskLevel riskLevel;
-        if (totalScore < 10) {
-            riskLevel = RiskLevel.LOW;
-        } else if (totalScore < 20) {
-            riskLevel = RiskLevel.MEDIUM;
-        } else {
-            riskLevel = RiskLevel.HIGH;
-        }
+        RiskLevel riskLevel = determineRiskLevel(assessment.getType(), totalScore);
+
 
         // 4. Tìm đề xuất rủi ro tương ứng
         RiskRecommendation recommendation = riskRecommendationRepository.findByRiskLevel(riskLevel)
@@ -296,5 +290,31 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
 
             return convertToResponse(result);
         }
+
+    // dùng để tính điểm riêng biệt từng bài đánh giá theo loại
+    public RiskLevel determineRiskLevel(AssessmentType type, int totalScore) {
+        switch (type) {
+            case ASSIST:
+                if (totalScore < 10) {
+                    return RiskLevel.LOW;
+                } else if (totalScore < 20) {
+                    return RiskLevel.MEDIUM;
+                } else {
+                    return RiskLevel.HIGH;
+                }
+
+            case CRAFFT:
+                if (totalScore < 1) {
+                    return RiskLevel.LOW;
+                } else if (totalScore < 2) {
+                    return RiskLevel.MEDIUM;
+                } else {
+                    return RiskLevel.HIGH;
+                }
+
+            default:
+                throw new IllegalArgumentException("Unsupported assessment type for risk evaluation: " + type);
+        }
+    }
 
 }
