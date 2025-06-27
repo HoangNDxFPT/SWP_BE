@@ -115,7 +115,8 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
     assessment.setMember(user);
     assessment = assessmentRepository.save(assessment);
 
-    List<AssessmentQuestion> questions = assessmentQuestionRepository.findByAssessmentTypeOrderByQuestionOrder(type);
+    List<AssessmentQuestion> questions = assessmentQuestionRepository.findByAssessmentTypeAndIsDeletedFalseOrderByQuestionOrder(type);
+
 
     List<AssessmentStartResponse.QuestionDTO> questionDtos = questions.stream().map(q -> {
         AssessmentStartResponse.QuestionDTO qDto = new AssessmentStartResponse.QuestionDTO();
