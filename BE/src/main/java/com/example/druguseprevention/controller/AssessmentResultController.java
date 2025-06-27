@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/assessment-results")
+@RequestMapping("/api/assessment-results")
 @SecurityRequirement(name = "api")
 public class AssessmentResultController {
 

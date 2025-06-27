@@ -11,4 +11,5 @@ public interface AssessmentQuestionRepository extends JpaRepository<AssessmentQu
     List<AssessmentQuestion> findByAssessmentTypeOrderByQuestionOrder(AssessmentType type);
     List<AssessmentQuestion> findByIsDeletedFalse();
     Optional<AssessmentQuestion> findByIdAndIsDeletedFalse(Long id);
+    List<AssessmentQuestion> findByAssessmentTypeAndIsDeletedFalseOrderByQuestionOrder(AssessmentType type);
 }
