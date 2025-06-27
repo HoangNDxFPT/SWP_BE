@@ -24,4 +24,7 @@ public class ConsultantDetail {
     @MapsId
     @JoinColumn(name = "consultant_id")
     private User user;
+    @Column(name = "certified_degree")
+    private String certifiedDegree;
+
 }
