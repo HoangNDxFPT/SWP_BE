@@ -101,26 +101,36 @@ public class ConsultantServiceImpl implements ConsultantService {
     // ✅ Cập nhật hồ sơ tư vấn viên
     @Override
     public void updateProfile(Long consultantId, ConsultantProfileDto dto) {
+        // Lấy user từ database
         User user = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
+
+        // Cập nhật thông tin từ DTO vào User
         user.setFullName(dto.getFullName());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setAddress(dto.getAddress());
-        userRepository.save(user);
+        userRepository.save(user); // lưu user trước
+
 
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
+
+
         if (detail == null) {
             detail = new ConsultantDetail();
-            detail.setConsultantId(consultantId);
             detail.setUser(user);
         }
+
 
         detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
         detail.setInformation(dto.getInformation());
-        detail.setCertifiedDegree(dto.getCertifiedDegree()); // ✅ Thêm certifiedDegree
+        detail.setCertifiedDegree(dto.getCertifiedDegree());
+        detail.setCertifiedDegreeImage(dto.getCertifiedDegreeImage());
+
+        // Lưu lại ConsultantDetail
         consultantDetailRepository.save(detail);
     }
+
 
     @Override
     public ConsultantProfileDto getProfile(Long consultantId) {
