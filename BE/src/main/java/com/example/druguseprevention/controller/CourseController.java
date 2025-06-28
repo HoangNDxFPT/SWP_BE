@@ -18,7 +18,7 @@ public class CourseController {
 
     private final CourseServiceImpl courseService;
     private final CourseQuizService courseQuizService; // ✅ thêm
-    private final CourseService courseService;
+//    private final CourseService courseService;
 
     @SecurityRequirement(name = "api")
     @GetMapping

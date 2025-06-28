@@ -22,5 +22,7 @@ public interface ConsultantService {
 
     List<UserProfileDto> getAllMemberProfiles();
     ConsultantProfileDto getProfile(Long consultantId);
+    List<AppointmentDto> getAppointmentsByUserId(Long userId);
+
 
 }

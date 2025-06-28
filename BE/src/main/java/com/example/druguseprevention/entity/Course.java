@@ -29,7 +29,6 @@ public class Course {
     @Enumerated(EnumType.STRING)
     private TargetAgeGroup targetAgeGroup;
 
-    private String type;
 
     @Column(columnDefinition = "TEXT")
     private String url;

@@ -130,6 +130,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
 
         ConsultantProfileDto dto = new ConsultantProfileDto();
+        dto.setConsultantId(consultantId);
         dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setAddress(user.getAddress());
@@ -139,6 +140,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setDegree(detail.getDegree());
             dto.setInformation(detail.getInformation());
             dto.setCertifiedDegree(detail.getCertifiedDegree()); // ✅ Lấy certifiedDegree
+            dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
         }
 
         return dto;
@@ -237,4 +239,22 @@ public class ConsultantServiceImpl implements ConsultantService {
                 })
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<AppointmentDto> getAppointmentsByUserId(Long userId) {
+        return appointmentRepository.findByUserId(userId).stream().map(appointment -> {
+            AppointmentDto dto = new AppointmentDto();
+            dto.setId(appointment.getId());
+            dto.setAppointmentTime(appointment.getAppointmentTime());
+            dto.setStatus(appointment.getStatus());
+            dto.setNote(appointment.getNote());
+
+            if (appointment.getConsultant() != null) {
+                dto.setConsultantFullName(appointment.getConsultant().getFullName());
+                dto.setConsultantEmail(appointment.getConsultant().getEmail());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }

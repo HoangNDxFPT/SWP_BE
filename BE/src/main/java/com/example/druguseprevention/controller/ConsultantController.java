@@ -9,11 +9,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
+
 @SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -141,8 +148,30 @@ public class ConsultantController {
         public ResponseEntity<ConsultantProfileDto> getConsultantProfile() {
             return ResponseEntity.ok(consultantService.getProfile(getCurrentUserId()));
         }
+    @PostMapping("/upload-certificate")
+    public ResponseEntity<String> uploadCertificateImage(@RequestParam("file") MultipartFile file) {
+        try {
+            // Tạo thư mục nếu chưa có
+            String uploadDir = "uploads/certificates";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
 
+            // Đặt tên file duy nhất
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path path = Paths.get(uploadDir, fileName);
+            file.transferTo(path);
+
+            // Trả về đường dẫn (có thể là URL nếu bạn dùng cloud/CDN)
+            String fileUrl = "/uploads/certificates/" + fileName;
+            return ResponseEntity.ok(fileUrl);
+
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Upload failed: " + e.getMessage());
+        }
     }
+
+
+}
 
 
 
