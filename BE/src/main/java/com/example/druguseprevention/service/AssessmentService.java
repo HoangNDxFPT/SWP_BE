@@ -109,6 +109,7 @@ public class AssessmentService {
 public AssessmentStartResponse startAssessment(AssessmentType type) {
     User user = getCurrentUser();
 
+    // tạo mới bài đánh giá và lưu vào db
     Assessment assessment = new Assessment();
     assessment.setType(type);
     assessment.setCreatedAt(LocalDateTime.now());

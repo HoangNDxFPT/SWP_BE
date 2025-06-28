@@ -16,8 +16,9 @@ public class AssessmentResultResponse {
     private RiskLevel riskLevel;
     private String recommendation;
     private LocalDateTime submittedAt;
-    private List<AnswerDetail> answers;
     private List<CourseDTO> recommendedCourses;
+    private List<AnswerDetail> answers;
+
 
     @Data
     public static class AnswerDetail {
