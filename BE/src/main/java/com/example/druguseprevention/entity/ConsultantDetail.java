@@ -26,5 +26,8 @@ public class ConsultantDetail {
     private User user;
     @Column(name = "certified_degree")
     private String certifiedDegree;
+    @Column(name = "certified_degree_image")
+    private String certifiedDegreeImage; // ✅ đường dẫn ảnh
+
 
 }

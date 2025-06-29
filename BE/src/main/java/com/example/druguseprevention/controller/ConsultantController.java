@@ -6,14 +6,26 @@ import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.ConsultantService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.multipart.MultipartFile;
+
+
 @SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -23,6 +35,20 @@ public class ConsultantController {
 
     private final ConsultantService consultantService;
     private final UserRepository userRepository;
+
+    @GetMapping("/{id}/available-slots")
+    public ResponseEntity<ConsultantAvailableSlotsResponse> getAvailableSlots(
+            @PathVariable("id") Long consultantId,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(consultantService.getAvailableSlots(consultantId, date));
+    }
+
+
+    @GetMapping("/profile/{consultantId}")
+    public ResponseEntity<ConsultantProfileDto> getConsultantProfile(@PathVariable Long consultantId) {
+        ConsultantProfileDto profile = consultantService.getProfile(consultantId);
+        return ResponseEntity.ok(profile);
+    }
 
     // ✅ Lấy userId từ token (username nằm trong token)
     private Long getCurrentUserId() {
@@ -57,10 +83,10 @@ public class ConsultantController {
     }
 
     // CN04: Xem phân tích khảo sát của user
-    @GetMapping("/survey-analysis/{userId}")
-    public ResponseEntity<List<SurveyAnalysisDto>> getSurveyAnalysis(@PathVariable Long userId) {
-        return ResponseEntity.ok(consultantService.getSurveyAnalysis(userId));
-    }
+//    @GetMapping("/survey-analysis/{userId}")
+//    public ResponseEntity<List<SurveyAnalysisDto>> getSurveyAnalysis(@PathVariable Long userId) {
+//        return ResponseEntity.ok(consultantService.getSurveyAnalysis(userId));
+//    }
 
     // CN03: Ghi chú hồ sơ người dùng
     @PutMapping("/user/{userId}/note")
@@ -141,8 +167,49 @@ public class ConsultantController {
         public ResponseEntity<ConsultantProfileDto> getConsultantProfile() {
             return ResponseEntity.ok(consultantService.getProfile(getCurrentUserId()));
         }
+    @PostMapping("/upload-certificate")
+    public ResponseEntity<String> uploadCertificateImage(@RequestParam("file") MultipartFile file) {
+        try {
+            // Tạo thư mục nếu chưa có
+            String uploadDir = "uploads/certificates";
+            File dir = new File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+
+            // Đặt tên file duy nhất
+            String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
+            Path path = Paths.get(uploadDir, fileName);
+            file.transferTo(path);
+
+            // Trả về đường dẫn (có thể là URL nếu bạn dùng cloud/CDN)
+            String fileUrl = "/uploads/certificates/" + fileName;
+            return ResponseEntity.ok(fileUrl);
+
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().body("Upload failed: " + e.getMessage());
+        }
+    }
+        @PostMapping("/profile/image")
+        public ResponseEntity<?> uploadCertifiedDegreeImage(@RequestParam("file") MultipartFile file) {
+            try {
+                Path uploadPath = Paths.get("uploads/consultants");
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                String fileUrl = "/uploads/consultants/" + fileName;
+                return ResponseEntity.ok(Map.of("url", fileUrl));
+            } catch (IOException e) {
+                return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
+            }
+        }
 
     }
+
+
 
 
 

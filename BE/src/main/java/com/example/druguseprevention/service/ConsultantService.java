@@ -2,6 +2,7 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ConsultantService {
@@ -9,7 +10,6 @@ public interface ConsultantService {
     List<AppointmentDto> getAppointments(Long consultantId);
     void confirmAppointment(Long id);
     void rejectAppointment(Long id);
-    List<SurveyAnalysisDto> getSurveyAnalysis(Long userId);
     void updateUserNote(Long userId, String note);                         // CN03
     void suggestAction(Long userId, ConsultantSuggestionDto suggestion);  // CN05
     void updateProfile(Long consultantId, ConsultantProfileDto profile);  // CN06
@@ -22,5 +22,7 @@ public interface ConsultantService {
 
     List<UserProfileDto> getAllMemberProfiles();
     ConsultantProfileDto getProfile(Long consultantId);
+    List<AppointmentDto> getAppointmentsByUserId(Long userId);
+    ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date);
 
 }
