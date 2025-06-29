@@ -7,11 +7,13 @@ import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.ConsultantDetailRepository;
-import com.example.druguseprevention.repository.SurveyResultRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 public class ConsultantServiceImpl implements ConsultantService {
 
     private final AppointmentRepository appointmentRepository;
-    private final SurveyResultRepository surveyResultRepository;
+
     private final UserRepository userRepository;
     private final ConsultantDetailRepository consultantDetailRepository;
 
@@ -65,16 +67,16 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.save(appointment);
     }
 
-    @Override
-    public List<SurveyAnalysisDto> getSurveyAnalysis(Long userId) {
-        return surveyResultRepository.findByUserId(userId).stream().map(result -> {
-            SurveyAnalysisDto dto = new SurveyAnalysisDto();
-            dto.setQuestion(result.getQuestion());
-            dto.setAnswer(result.getAnswer());
-            dto.setSuggestion(result.getSuggestion());
-            return dto;
-        }).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<SurveyAnalysisDto> getSurveyAnalysis(Long userId) {
+//        return surveyResultRepository.findByUserId(userId).stream().map(result -> {
+//            SurveyAnalysisDto dto = new SurveyAnalysisDto();
+//            dto.setQuestion(result.getQuestion());
+//            dto.setAnswer(result.getAnswer());
+//            dto.setSuggestion(result.getSuggestion());
+//            return dto;
+//        }).collect(Collectors.toList());
+//    }
 
     @Override
     public void updateUserNote(Long userId, String note) {
@@ -101,35 +103,49 @@ public class ConsultantServiceImpl implements ConsultantService {
     // ✅ Cập nhật hồ sơ tư vấn viên
     @Override
     public void updateProfile(Long consultantId, ConsultantProfileDto dto) {
+        // Lấy user từ database
         User user = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
+
+        // Cập nhật thông tin từ DTO vào User
         user.setFullName(dto.getFullName());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setAddress(dto.getAddress());
-        userRepository.save(user);
+        userRepository.save(user); // lưu user trước
+
 
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
+
+
         if (detail == null) {
             detail = new ConsultantDetail();
-            detail.setConsultantId(consultantId);
             detail.setUser(user);
         }
+
 
         detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
         detail.setInformation(dto.getInformation());
-        detail.setCertifiedDegree(dto.getCertifiedDegree()); // ✅ Thêm certifiedDegree
+        detail.setCertifiedDegree(dto.getCertifiedDegree());
+        detail.setCertifiedDegreeImage(dto.getCertifiedDegreeImage());
+
+        // Lưu lại ConsultantDetail
         consultantDetailRepository.save(detail);
     }
+
 
     @Override
     public ConsultantProfileDto getProfile(Long consultantId) {
         User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
-
+        // Kiểm tra role là CONSULTANT
+        if (user.getRole() != Role.CONSULTANT) {
+            throw new RuntimeException("Người dùng không phải là tư vấn viên");
+        }
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
 
         ConsultantProfileDto dto = new ConsultantProfileDto();
+        dto.setConsultantId(consultantId);
         dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setAddress(user.getAddress());
@@ -139,6 +155,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setDegree(detail.getDegree());
             dto.setInformation(detail.getInformation());
             dto.setCertifiedDegree(detail.getCertifiedDegree()); // ✅ Lấy certifiedDegree
+            dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
         }
 
         return dto;
@@ -237,4 +254,69 @@ public class ConsultantServiceImpl implements ConsultantService {
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<AppointmentDto> getAppointmentsByUserId(Long userId) {
+        return appointmentRepository.findByUserId(userId).stream().map(appointment -> {
+            AppointmentDto dto = new AppointmentDto();
+            dto.setId(appointment.getId());
+            dto.setAppointmentTime(appointment.getAppointmentTime());
+            dto.setStatus(appointment.getStatus());
+            dto.setNote(appointment.getNote());
+
+            if (appointment.getConsultant() != null) {
+                dto.setConsultantFullName(appointment.getConsultant().getFullName());
+                dto.setConsultantEmail(appointment.getConsultant().getEmail());
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date) {
+        List<Appointment> appointments = appointmentRepository.findByConsultantIdAndDate(consultantId, date);
+
+        List<ConsultantAvailableSlotsResponse.TimeSlot> timeSlots = generateTimeSlots().stream()
+                .map(slot -> {
+                    boolean isBooked = appointments.stream().anyMatch(
+                            a -> a.getAppointmentTime().toLocalTime().equals(slot.getStartTime())
+                                    || (a.getAppointmentTime().isAfter(date.atTime(LocalTime.parse(slot.getStartTime())))
+                                    && a.getAppointmentTime().isBefore(date.atTime(LocalTime.parse(slot.getEndTime()))))
+                    );
+                    return ConsultantAvailableSlotsResponse.TimeSlot.builder()
+                            .startTime(slot.getStartTime().toString())
+                            .endTime(slot.getEndTime().toString())
+                            .available(!isBooked)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ConsultantAvailableSlotsResponse.builder()
+                .consultantId(consultantId)
+                .date(date.toString())
+                .timeSlots(timeSlots)
+                .build();
+    }
+
+    private List<ConsultantAvailableSlotsResponse.TimeSlot> generateTimeSlots() {
+        List<ConsultantAvailableSlotsResponse.TimeSlot> slots = new ArrayList<>();
+        LocalTime start = LocalTime.of(8, 0); // ví dụ: bắt đầu 8h sáng
+        LocalTime end = LocalTime.of(17, 0);  // kết thúc 5h chiều
+        int durationMinutes = 45;
+
+        while (start.plusMinutes(durationMinutes).isBefore(end.plusSeconds(1))) {
+            LocalTime slotEnd = start.plusMinutes(durationMinutes);
+            slots.add(ConsultantAvailableSlotsResponse.TimeSlot.builder()
+                    .startTime(String.valueOf(start))
+                    .endTime(String.valueOf(slotEnd))
+                    .available(true)
+                    .build());
+            start = slotEnd;
+        }
+
+        return slots;
+    }
+
+
 }

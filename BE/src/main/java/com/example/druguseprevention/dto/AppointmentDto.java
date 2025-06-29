@@ -13,4 +13,7 @@ public class AppointmentDto {
     private String note;
     private String userFullName;
     private String userEmail;
+    private String consultantFullName;
+    private String consultantEmail;
+
 }
