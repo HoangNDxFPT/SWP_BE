@@ -10,7 +10,6 @@ public interface ConsultantService {
     List<AppointmentDto> getAppointments(Long consultantId);
     void confirmAppointment(Long id);
     void rejectAppointment(Long id);
-    List<SurveyAnalysisDto> getSurveyAnalysis(Long userId);
     void updateUserNote(Long userId, String note);                         // CN03
     void suggestAction(Long userId, ConsultantSuggestionDto suggestion);  // CN05
     void updateProfile(Long consultantId, ConsultantProfileDto profile);  // CN06

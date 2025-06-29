@@ -7,7 +7,6 @@ import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.ConsultantDetailRepository;
-import com.example.druguseprevention.repository.SurveyResultRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ import java.util.stream.Collectors;
 public class ConsultantServiceImpl implements ConsultantService {
 
     private final AppointmentRepository appointmentRepository;
-    private final SurveyResultRepository surveyResultRepository;
+
     private final UserRepository userRepository;
     private final ConsultantDetailRepository consultantDetailRepository;
 
@@ -68,16 +67,16 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.save(appointment);
     }
 
-    @Override
-    public List<SurveyAnalysisDto> getSurveyAnalysis(Long userId) {
-        return surveyResultRepository.findByUserId(userId).stream().map(result -> {
-            SurveyAnalysisDto dto = new SurveyAnalysisDto();
-            dto.setQuestion(result.getQuestion());
-            dto.setAnswer(result.getAnswer());
-            dto.setSuggestion(result.getSuggestion());
-            return dto;
-        }).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<SurveyAnalysisDto> getSurveyAnalysis(Long userId) {
+//        return surveyResultRepository.findByUserId(userId).stream().map(result -> {
+//            SurveyAnalysisDto dto = new SurveyAnalysisDto();
+//            dto.setQuestion(result.getQuestion());
+//            dto.setAnswer(result.getAnswer());
+//            dto.setSuggestion(result.getSuggestion());
+//            return dto;
+//        }).collect(Collectors.toList());
+//    }
 
     @Override
     public void updateUserNote(Long userId, String note) {

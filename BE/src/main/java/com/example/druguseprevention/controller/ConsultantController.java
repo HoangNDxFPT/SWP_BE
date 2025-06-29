@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -82,10 +83,10 @@ public class ConsultantController {
     }
 
     // CN04: Xem phân tích khảo sát của user
-    @GetMapping("/survey-analysis/{userId}")
-    public ResponseEntity<List<SurveyAnalysisDto>> getSurveyAnalysis(@PathVariable Long userId) {
-        return ResponseEntity.ok(consultantService.getSurveyAnalysis(userId));
-    }
+//    @GetMapping("/survey-analysis/{userId}")
+//    public ResponseEntity<List<SurveyAnalysisDto>> getSurveyAnalysis(@PathVariable Long userId) {
+//        return ResponseEntity.ok(consultantService.getSurveyAnalysis(userId));
+//    }
 
     // CN03: Ghi chú hồ sơ người dùng
     @PutMapping("/user/{userId}/note")
