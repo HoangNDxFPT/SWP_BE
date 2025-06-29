@@ -11,7 +11,6 @@ public class AssessmentStartResponse {
     // Annotation này dùng để không hiện id và id tự động điền
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
 
-    private Long assessmentId;
     private String type;
     private String message;
     private List<QuestionDTO> questions;
