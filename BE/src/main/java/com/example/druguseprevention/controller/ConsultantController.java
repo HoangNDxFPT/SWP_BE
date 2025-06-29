@@ -6,6 +6,7 @@ import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.ConsultantService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +34,14 @@ public class ConsultantController {
 
     private final ConsultantService consultantService;
     private final UserRepository userRepository;
+
+    @GetMapping("/{id}/available-slots")
+    public ResponseEntity<ConsultantAvailableSlotsResponse> getAvailableSlots(
+            @PathVariable("id") Long consultantId,
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(consultantService.getAvailableSlots(consultantId, date));
+    }
+
 
     @GetMapping("/profile/{consultantId}")
     public ResponseEntity<ConsultantProfileDto> getConsultantProfile(@PathVariable Long consultantId) {

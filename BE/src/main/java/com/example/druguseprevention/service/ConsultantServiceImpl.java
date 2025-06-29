@@ -12,6 +12,9 @@ import com.example.druguseprevention.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -252,6 +255,7 @@ public class ConsultantServiceImpl implements ConsultantService {
                 })
                 .collect(Collectors.toList());
     }
+
     @Override
     public List<AppointmentDto> getAppointmentsByUserId(Long userId) {
         return appointmentRepository.findByUserId(userId).stream().map(appointment -> {
@@ -269,5 +273,51 @@ public class ConsultantServiceImpl implements ConsultantService {
             return dto;
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date) {
+        List<Appointment> appointments = appointmentRepository.findByConsultantIdAndDate(consultantId, date);
+
+        List<ConsultantAvailableSlotsResponse.TimeSlot> timeSlots = generateTimeSlots().stream()
+                .map(slot -> {
+                    boolean isBooked = appointments.stream().anyMatch(
+                            a -> a.getAppointmentTime().toLocalTime().equals(slot.getStartTime())
+                                    || (a.getAppointmentTime().isAfter(date.atTime(LocalTime.parse(slot.getStartTime())))
+                                    && a.getAppointmentTime().isBefore(date.atTime(LocalTime.parse(slot.getEndTime()))))
+                    );
+                    return ConsultantAvailableSlotsResponse.TimeSlot.builder()
+                            .startTime(slot.getStartTime().toString())
+                            .endTime(slot.getEndTime().toString())
+                            .available(!isBooked)
+                            .build();
+                })
+                .collect(Collectors.toList());
+
+        return ConsultantAvailableSlotsResponse.builder()
+                .consultantId(consultantId)
+                .date(date.toString())
+                .timeSlots(timeSlots)
+                .build();
+    }
+
+    private List<ConsultantAvailableSlotsResponse.TimeSlot> generateTimeSlots() {
+        List<ConsultantAvailableSlotsResponse.TimeSlot> slots = new ArrayList<>();
+        LocalTime start = LocalTime.of(8, 0); // ví dụ: bắt đầu 8h sáng
+        LocalTime end = LocalTime.of(17, 0);  // kết thúc 5h chiều
+        int durationMinutes = 45;
+
+        while (start.plusMinutes(durationMinutes).isBefore(end.plusSeconds(1))) {
+            LocalTime slotEnd = start.plusMinutes(durationMinutes);
+            slots.add(ConsultantAvailableSlotsResponse.TimeSlot.builder()
+                    .startTime(String.valueOf(start))
+                    .endTime(String.valueOf(slotEnd))
+                    .available(true)
+                    .build());
+            start = slotEnd;
+        }
+
+        return slots;
+    }
+
 
 }

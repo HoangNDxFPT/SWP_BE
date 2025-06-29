@@ -2,6 +2,7 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ConsultantService {
@@ -23,6 +24,6 @@ public interface ConsultantService {
     List<UserProfileDto> getAllMemberProfiles();
     ConsultantProfileDto getProfile(Long consultantId);
     List<AppointmentDto> getAppointmentsByUserId(Long userId);
-
+    ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date);
 
 }
