@@ -107,14 +107,7 @@ public class AssessmentService {
 
 // Bắt đầu làm bài đánh giá
 public AssessmentStartResponse startAssessment(AssessmentType type) {
-    User user = getCurrentUser();
 
-    // tạo mới bài đánh giá và lưu vào db
-    Assessment assessment = new Assessment();
-    assessment.setType(type);
-    assessment.setCreatedAt(LocalDateTime.now());
-    assessment.setMember(user);
-    assessment = assessmentRepository.save(assessment);
 
     List<AssessmentQuestion> questions = assessmentQuestionRepository.findByAssessmentTypeAndIsDeletedFalseOrderByQuestionOrder(type);
 
@@ -138,7 +131,6 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
     }).toList();
 
     AssessmentStartResponse response = new AssessmentStartResponse();
-    response.setAssessmentId(assessment.getId());
     response.setType(type.name());
     response.setMessage("Assessment started");
     response.setQuestions(questionDtos);
@@ -171,32 +163,18 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
 
 //    Xử lý khi người dùng submit bài đánh giá
     @Transactional // dùng để khi mà hàm này chạy bị lỗi ở 1 đoạn nào đó thì nó sẽ ko lưu xuống DB
-    public AssessmentResultResponse  submit(Long assessmentId, List<AssessmentSubmissionRequest> assessmentSubmissionRequests) {
-        // 1. Lấy bài đánh giá đã được tạo ở bước start
-        Assessment assessment = assessmentRepository.findById(assessmentId)
-                .orElseThrow(() -> new BadRequestException("Assessment not found: " + assessmentId));
+    public AssessmentResultResponse  submit(AssessmentType type, List<AssessmentSubmissionRequest> assessmentSubmissionRequests) {
 
-        // chỉ đc submit 1 lần
-        if (assessment.isSubmitted()) {
-            throw new BadRequestException("This assessment has already been submitted.");
-        }
+        User user = getCurrentUser();
 
-        User user = assessment.getMember();
+        // 1. Tạo mới assessment
+        Assessment assessment = new Assessment();
+        assessment.setType(type);
+        assessment.setCreatedAt(LocalDateTime.now());
+        assessment.setMember(user);
+        assessment.setSubmitted(true); // đánh dấu đã nộp
+        assessment = assessmentRepository.save(assessment);
 
-        // 2. Chuẩn bị danh sách câu hỏi và câu trả lời
-        List<Long> questionIds = assessmentSubmissionRequests.stream()
-                .map(AssessmentSubmissionRequest::getQuestionId)
-                .toList();
-
-        List<Long> answerIds = assessmentSubmissionRequests.stream()
-                .map(AssessmentSubmissionRequest::getAnswerId)
-                .toList();
-
-        Map<Long, AssessmentQuestion> questionsMap = assessmentQuestionRepository.findAllById(questionIds).stream()
-                .collect(Collectors.toMap(AssessmentQuestion::getId, Function.identity()));
-
-        Map<Long, AssessmentAnswer> answersMap = assessmentAnswerRepository.findAllById(answerIds).stream()
-                .collect(Collectors.toMap(AssessmentAnswer::getId, Function.identity()));
 
         // 2. Duyệt từng câu trả lời, tính tổng điểm và lưu tạm vào danh sách
         int totalScore = 0;
@@ -257,11 +235,8 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
         }
         userAssessmentAnswerRepository.saveAll(userAssessmentAnswers);
 
-        // 7. Đánh dấu bài đã được nộp
-        assessment.setSubmitted(true);
-        assessmentRepository.save(assessment);
 
-        // 8. Nếu rủi ro mức trung bình -> đề xuất khóa học phù hợp độ tuổi
+        // 7. Nếu rủi ro mức trung bình -> đề xuất khóa học phù hợp độ tuổi
         if (riskLevel == RiskLevel.MEDIUM) {
             int age = Period.between(user.getDateOfBirth(), LocalDate.now()).getYears();
             Course.TargetAgeGroup group;

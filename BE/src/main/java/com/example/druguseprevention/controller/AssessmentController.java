@@ -71,10 +71,10 @@ public class AssessmentController {
 
     @PostMapping("/submit")
     public ResponseEntity<AssessmentResultResponse> submitAssessment(
-            @RequestParam Long assessmentId,
+            @RequestParam AssessmentType type,
             @RequestBody List<AssessmentSubmissionRequest> submissionRequests) {
 
-        AssessmentResultResponse response = assessmentService.submit(assessmentId, submissionRequests);
+        AssessmentResultResponse response = assessmentService.submit(type, submissionRequests);
         return ResponseEntity.ok(response);
     }
 }
