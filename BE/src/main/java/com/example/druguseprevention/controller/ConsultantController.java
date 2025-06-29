@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -169,9 +171,28 @@ public class ConsultantController {
             return ResponseEntity.internalServerError().body("Upload failed: " + e.getMessage());
         }
     }
+        @PostMapping("/profile/image")
+        public ResponseEntity<?> uploadCertifiedDegreeImage(@RequestParam("file") MultipartFile file) {
+            try {
+                Path uploadPath = Paths.get("uploads/consultants");
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+                Path filePath = uploadPath.resolve(fileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                String fileUrl = "/uploads/consultants/" + fileName;
+                return ResponseEntity.ok(Map.of("url", fileUrl));
+            } catch (IOException e) {
+                return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
+            }
+        }
+
+    }
 
 
-}
 
 
 
