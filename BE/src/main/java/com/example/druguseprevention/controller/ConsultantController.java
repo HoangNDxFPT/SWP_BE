@@ -33,6 +33,12 @@ public class ConsultantController {
     private final ConsultantService consultantService;
     private final UserRepository userRepository;
 
+    @GetMapping("/profile/{consultantId}")
+    public ResponseEntity<ConsultantProfileDto> getConsultantProfile(@PathVariable Long consultantId) {
+        ConsultantProfileDto profile = consultantService.getProfile(consultantId);
+        return ResponseEntity.ok(profile);
+    }
+
     // ✅ Lấy userId từ token (username nằm trong token)
     private Long getCurrentUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
