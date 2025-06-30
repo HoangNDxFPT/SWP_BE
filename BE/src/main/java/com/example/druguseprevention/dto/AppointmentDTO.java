@@ -6,7 +6,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class AppointmentDto {
+public class AppointmentDTO {
     private Long id;
     private LocalDateTime appointmentTime;
     private Status status;

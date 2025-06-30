@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
@@ -15,4 +16,10 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     @Query("SELECT a FROM Appointment a WHERE a.consultant.id = :consultantId AND DATE(a.appointmentTime) = :date")
     List<Appointment> findByConsultantIdAndDate(@Param("consultantId") Long consultantId, @Param("date") LocalDate date);
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE a.consultant.id = :consultantId AND DATE(a.appointmentTime) = :date AND TIME(a.appointmentTime) >= :start AND TIME(a.appointmentTime) < :end")
+    int countByConsultantIdAndTimeRange(@Param("consultantId") Long consultantId,
+                                        @Param("date") LocalDate date,
+                                        @Param("start") LocalTime start,
+                                        @Param("end") LocalTime end);
+
 }

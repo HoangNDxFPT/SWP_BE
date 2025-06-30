@@ -1,6 +1,6 @@
 package com.example.druguseprevention.controller;
 
-import com.example.druguseprevention.dto.AppointmentDto;
+import com.example.druguseprevention.dto.AppointmentDTO;
 import com.example.druguseprevention.service.ConsultantService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +26,9 @@ public class BookingController {
 
     // ✅ API: Lấy danh sách cuộc hẹn của tôi
     @GetMapping("/my-booking")
-    public ResponseEntity<List<AppointmentDto>> getMyBookings() {
+    public ResponseEntity<List<AppointmentDTO>> getMyBookings() {
         Long userId = getCurrentUserId();
-        List<AppointmentDto> bookings = consultantService.getAppointmentsByUserId(userId);
+        List<AppointmentDTO> bookings = consultantService.getAppointmentsByUserId(userId);
         return ResponseEntity.ok(bookings);
     }
 }

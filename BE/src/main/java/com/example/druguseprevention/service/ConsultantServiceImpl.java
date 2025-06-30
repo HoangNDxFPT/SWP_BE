@@ -38,9 +38,9 @@ public class ConsultantServiceImpl implements ConsultantService {
     }
 
     @Override
-    public List<AppointmentDto> getAppointments(Long consultantId) {
+    public List<AppointmentDTO> getAppointments(Long consultantId) {
         return appointmentRepository.findByConsultantId(consultantId).stream().map(appointment -> {
-            AppointmentDto dto = new AppointmentDto();
+            AppointmentDTO dto = new AppointmentDTO();
             dto.setId(appointment.getId());
             dto.setAppointmentTime(appointment.getAppointmentTime());
             dto.setStatus(appointment.getStatus());
@@ -256,9 +256,9 @@ public class ConsultantServiceImpl implements ConsultantService {
     }
 
     @Override
-    public List<AppointmentDto> getAppointmentsByUserId(Long userId) {
+    public List<AppointmentDTO> getAppointmentsByUserId(Long userId) {
         return appointmentRepository.findByUserId(userId).stream().map(appointment -> {
-            AppointmentDto dto = new AppointmentDto();
+            AppointmentDTO dto = new AppointmentDTO();
             dto.setId(appointment.getId());
             dto.setAppointmentTime(appointment.getAppointmentTime());
             dto.setStatus(appointment.getStatus());

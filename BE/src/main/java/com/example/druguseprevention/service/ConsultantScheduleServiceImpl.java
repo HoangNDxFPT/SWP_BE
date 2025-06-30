@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.ConsultantScheduleRequest;
 import com.example.druguseprevention.dto.ConsultantScheduleResponse;
 import com.example.druguseprevention.entity.ConsultantSchedule;
 import com.example.druguseprevention.entity.User;
+import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.ConsultantScheduleRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,18 @@ public class ConsultantScheduleServiceImpl implements ConsultantScheduleService 
 
     private final ConsultantScheduleRepository scheduleRepo;
     private final UserRepository userRepo;
+    private final AppointmentRepository appointmentRepo;
 
     private ConsultantScheduleResponse mapToDto(ConsultantSchedule schedule) {
+        int bookedCount = appointmentRepo.countByConsultantIdAndTimeRange(
+                schedule.getConsultant().getId(),
+                schedule.getWorkDate(),
+                schedule.getStartTime(),
+                schedule.getEndTime()
+        );
+
+        boolean isAvailable = bookedCount < schedule.getMaxAppointments();
+
         return ConsultantScheduleResponse.builder()
                 .scheduleId(schedule.getScheduleId())
                 .consultantId(schedule.getConsultant().getId())
@@ -26,8 +37,8 @@ public class ConsultantScheduleServiceImpl implements ConsultantScheduleService 
                 .workDate(schedule.getWorkDate())
                 .startTime(schedule.getStartTime())
                 .endTime(schedule.getEndTime())
-                .isAvailable(schedule.getIsAvailable())
                 .maxAppointments(schedule.getMaxAppointments())
+                .available(isAvailable)
                 .build();
     }
 
@@ -41,7 +52,6 @@ public class ConsultantScheduleServiceImpl implements ConsultantScheduleService 
                 .workDate(request.getWorkDate())
                 .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
-                .isAvailable(request.getIsAvailable() != null ? request.getIsAvailable() : true)
                 .maxAppointments(request.getMaxAppointments() != null ? request.getMaxAppointments() : 1)
                 .build();
 
@@ -60,7 +70,6 @@ public class ConsultantScheduleServiceImpl implements ConsultantScheduleService 
         schedule.setWorkDate(request.getWorkDate());
         schedule.setStartTime(request.getStartTime());
         schedule.setEndTime(request.getEndTime());
-        schedule.setIsAvailable(request.getIsAvailable());
         schedule.setMaxAppointments(request.getMaxAppointments());
 
         return mapToDto(scheduleRepo.save(schedule));

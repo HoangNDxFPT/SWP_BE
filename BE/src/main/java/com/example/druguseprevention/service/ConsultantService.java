@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ConsultantService {
     ConsultantDashboardDto getDashboard(Long consultantId);
-    List<AppointmentDto> getAppointments(Long consultantId);
+    List<AppointmentDTO> getAppointments(Long consultantId);
     void confirmAppointment(Long id);
     void rejectAppointment(Long id);
     void updateUserNote(Long userId, String note);                         // CN03
@@ -22,7 +22,7 @@ public interface ConsultantService {
 
     List<UserProfileDto> getAllMemberProfiles();
     ConsultantProfileDto getProfile(Long consultantId);
-    List<AppointmentDto> getAppointmentsByUserId(Long userId);
+    List<AppointmentDTO> getAppointmentsByUserId(Long userId);
     ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date);
 
 }

@@ -67,7 +67,7 @@ public class ConsultantController {
 
     // CN02: Xem danh sách lịch hẹn
     @GetMapping("/appointments")
-    public ResponseEntity<List<AppointmentDto>> getAppointments() {
+    public ResponseEntity<List<AppointmentDTO>> getAppointments() {
         return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
     }
 

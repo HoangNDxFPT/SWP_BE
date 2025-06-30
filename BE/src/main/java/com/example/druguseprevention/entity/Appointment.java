@@ -3,14 +3,12 @@ package com.example.druguseprevention.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "appointments")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Appointment {
 
     @Id
@@ -34,10 +32,15 @@ public class Appointment {
     @JoinColumn(name = "consultant_id")
     private User consultant;  // người tư vấn
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "schedule_id", nullable = false)
+    private ConsultantSchedule schedule;
+
     public enum Status {
         PENDING, CONFIRMED, REJECTED, COMPLETED
     }
 }
+
 //| Mục tiêu                       | Mô tả                                                                           |
 //| ------------------------------ | ------------------------------------------------------------------------------- |
 //| **Quản lý cuộc hẹn**           | Mỗi bản ghi đại diện cho một lần người dùng đặt lịch tư vấn với một tư vấn viên |

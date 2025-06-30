@@ -2,8 +2,11 @@ package com.example.druguseprevention.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "consultant_schedule")
@@ -27,8 +30,13 @@ public class ConsultantSchedule {
     private LocalTime endTime;
 
     @Column(nullable = false)
-    private Boolean isAvailable = true;
-
-    @Column(nullable = false)
     private Integer maxAppointments = 1;
+
+    @OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Appointment> appointments = new ArrayList<>();
+
+    @Transient
+    public boolean isAvailable() {
+        return appointments.size() < maxAppointments;
+    }
 }

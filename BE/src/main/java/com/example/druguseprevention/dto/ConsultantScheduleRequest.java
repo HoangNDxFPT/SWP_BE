@@ -30,8 +30,5 @@ public class ConsultantScheduleRequest {
     @JsonFormat(pattern = "HH:mm:ss")
     @Schema(type = "string", example = "17:00:00")
     private LocalTime endTime;
-
-    private Boolean isAvailable;
-
     private Integer maxAppointments;
 }

@@ -29,7 +29,6 @@ public class ConsultantScheduleResponse {
     @Schema(type = "string", format = "time", example = "17:00:00")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime endTime;
-
-    private Boolean isAvailable;
+    private Boolean available;
     private Integer maxAppointments;
 }
