@@ -6,12 +6,14 @@ import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.CourseRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.EnrollmentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+@SecurityRequirement(name = "api")
+@SecurityRequirement(name = "bearer-key")
 @RestController
 @RequestMapping("/api/enrollments")
 public class EnrollmentController {

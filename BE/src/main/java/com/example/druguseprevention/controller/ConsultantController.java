@@ -6,7 +6,10 @@ import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.ConsultantService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -206,8 +209,49 @@ public class ConsultantController {
                 return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
             }
         }
+    @GetMapping("/uploads/certificates/{fileName:.+}")
+    public ResponseEntity<Resource> getCertificateImage(@PathVariable String fileName) {
+        try {
+            Path filePath = Paths.get("uploads/certificates").resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) {
+                String contentType = Files.probeContentType(filePath);
+                return ResponseEntity.ok()
+                        .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+        @GetMapping("/uploads/consultants/{fileName:.+}")
+        public ResponseEntity<Resource> getConsultantImage(@PathVariable String fileName) {
+            try {
+                Path filePath = Paths.get("uploads/consultants").resolve(fileName).normalize();
+                Resource resource = new UrlResource(filePath.toUri());
+
+                if (resource.exists()) {
+                    String contentType = Files.probeContentType(filePath);
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.parseMediaType(contentType != null ? contentType : "application/octet-stream"))
+                            .body(resource);
+                } else {
+                    return ResponseEntity.notFound().build();
+                }
+
+            } catch (IOException e) {
+                return ResponseEntity.internalServerError().build();
+            }
+        }
+
 
     }
+
+    
 
 
 
