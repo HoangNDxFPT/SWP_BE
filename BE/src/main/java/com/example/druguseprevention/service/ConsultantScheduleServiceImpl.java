@@ -6,7 +6,6 @@ import com.example.druguseprevention.entity.ConsultantSchedule;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.ConsultantScheduleRepository;
 import com.example.druguseprevention.repository.UserRepository;
-import com.example.druguseprevention.service.ConsultantScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;

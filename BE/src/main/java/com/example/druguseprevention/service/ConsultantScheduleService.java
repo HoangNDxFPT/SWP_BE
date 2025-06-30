@@ -2,6 +2,7 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.ConsultantScheduleRequest;
 import com.example.druguseprevention.dto.ConsultantScheduleResponse;
+
 import java.util.List;
 
 public interface ConsultantScheduleService {
