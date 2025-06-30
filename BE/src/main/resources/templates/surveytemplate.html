@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Survey Invitation</title>
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          background-color: #f4f6f8;
+          color: #333;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          background-color: #ffffff;
+          max-width: 600px;
+          margin: 30px auto;
+          padding: 30px;
+          border-radius: 8px;
+          box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+          text-align: center;
+          padding-bottom: 20px;
+        }
+        .header h2 {
+          color: #007bff;
+        }
+        .content {
+          font-size: 16px;
+          line-height: 1.6;
+        }
+        .button {
+          display: block;
+          text-align: center;
+          margin-top: 30px;
+        }
+        .btn {
+          background-color: #28a745;
+          color: white;
+          padding: 12px 24px;
+          border: none;
+          border-radius: 4px;
+          text-decoration: none;
+          font-weight: bold;
+          display: inline-block;
+        }
+        .footer {
+          text-align: center;
+          font-size: 13px;
+          color: #888;
+          margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h2>You're Invited to Take a Survey</h2>
+    </div>
+    <div class="content">
+        <p>Hello <strong th:text="${name}">User</strong>,</p>
+
+        <p>Thank you for registering for our community outreach program. To help us improve our services, we kindly ask you to complete the following survey:</p>
+
+        <div class="button">
+            <a th:href="${link}" class="btn" target="_blank">Take the Survey</a>
+        </div>
+
+        <p>Your feedback is invaluable in helping us deliver better and more effective programs to the community.</p>
+
+        <p>Best regards,<br/>The Organizing Team</p>
+    </div>
+    <div class="footer">
+        © 2025 Drug Use Prevention Support System
+    </div>
+</div>
+</body>
+</html>

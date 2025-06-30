@@ -96,7 +96,7 @@ public class AssessmentService {
         return assessmentQuestionRepository.findByAssessmentTypeOrderByQuestionOrder(type);
     }
 // Lấy thông tin user hiện tại khi đăng nhập
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUserName(username)
                 .orElseThrow(() -> new BadRequestException("User not found"));
