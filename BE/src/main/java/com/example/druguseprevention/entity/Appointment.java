@@ -32,9 +32,9 @@ public class Appointment {
     @JoinColumn(name = "consultant_id")
     private User consultant;  // người tư vấn
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "schedule_id", nullable = false)
-    private ConsultantSchedule schedule;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "schedule_id", nullable = false)
+////    private ConsultantSchedule schedule;
 
     public enum Status {
         PENDING, CONFIRMED, REJECTED, COMPLETED
