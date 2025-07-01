@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 public class ConsultantServiceImpl implements ConsultantService {
 
     private final AppointmentRepository appointmentRepository;
-
     private final UserRepository userRepository;
     private final ConsultantDetailRepository consultantDetailRepository;
 
@@ -39,16 +38,9 @@ public class ConsultantServiceImpl implements ConsultantService {
 
     @Override
     public List<AppointmentDTO> getAppointments(Long consultantId) {
-        return appointmentRepository.findByConsultantId(consultantId).stream().map(appointment -> {
-            AppointmentDTO dto = new AppointmentDTO();
-            dto.setId(appointment.getId());
-            dto.setAppointmentTime(appointment.getAppointmentTime());
-            dto.setStatus(appointment.getStatus());
-            dto.setNote(appointment.getNote());
-            dto.setUserFullName(appointment.getUser().getFullName());
-            dto.setUserEmail(appointment.getUser().getEmail());
-            return dto;
-        }).collect(Collectors.toList());
+        return appointmentRepository.findByConsultantId(consultantId)
+                .stream().map(this::toAppointmentDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -66,17 +58,6 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointment.setStatus(Appointment.Status.REJECTED);
         appointmentRepository.save(appointment);
     }
-
-//    @Override
-//    public List<SurveyAnalysisDto> getSurveyAnalysis(Long userId) {
-//        return surveyResultRepository.findByUserId(userId).stream().map(result -> {
-//            SurveyAnalysisDto dto = new SurveyAnalysisDto();
-//            dto.setQuestion(result.getQuestion());
-//            dto.setAnswer(result.getAnswer());
-//            dto.setSuggestion(result.getSuggestion());
-//            return dto;
-//        }).collect(Collectors.toList());
-//    }
 
     @Override
     public void updateUserNote(Long userId, String note) {
@@ -100,28 +81,21 @@ public class ConsultantServiceImpl implements ConsultantService {
         appointmentRepository.saveAll(appointments);
     }
 
-    // ✅ Cập nhật hồ sơ tư vấn viên
     @Override
     public void updateProfile(Long consultantId, ConsultantProfileDto dto) {
-        // Lấy user từ database
         User user = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
 
-        // Cập nhật thông tin từ DTO vào User
         user.setFullName(dto.getFullName());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setAddress(dto.getAddress());
-        userRepository.save(user); // lưu user trước
-
+        userRepository.save(user);
 
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
-
-
         if (detail == null) {
             detail = new ConsultantDetail();
             detail.setUser(user);
         }
-
 
         detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
@@ -129,19 +103,18 @@ public class ConsultantServiceImpl implements ConsultantService {
         detail.setCertifiedDegree(dto.getCertifiedDegree());
         detail.setCertifiedDegreeImage(dto.getCertifiedDegreeImage());
 
-        // Lưu lại ConsultantDetail
         consultantDetailRepository.save(detail);
     }
-
 
     @Override
     public ConsultantProfileDto getProfile(Long consultantId) {
         User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
-        // Kiểm tra role là CONSULTANT
+
         if (user.getRole() != Role.CONSULTANT) {
             throw new RuntimeException("Người dùng không phải là tư vấn viên");
         }
+
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
 
         ConsultantProfileDto dto = new ConsultantProfileDto();
@@ -154,7 +127,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setStatus(detail.getStatus());
             dto.setDegree(detail.getDegree());
             dto.setInformation(detail.getInformation());
-            dto.setCertifiedDegree(detail.getCertifiedDegree()); // ✅ Lấy certifiedDegree
+            dto.setCertifiedDegree(detail.getCertifiedDegree());
             dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
         }
 
@@ -257,20 +230,9 @@ public class ConsultantServiceImpl implements ConsultantService {
 
     @Override
     public List<AppointmentDTO> getAppointmentsByUserId(Long userId) {
-        return appointmentRepository.findByUserId(userId).stream().map(appointment -> {
-            AppointmentDTO dto = new AppointmentDTO();
-            dto.setId(appointment.getId());
-            dto.setAppointmentTime(appointment.getAppointmentTime());
-            dto.setStatus(appointment.getStatus());
-            dto.setNote(appointment.getNote());
-
-            if (appointment.getConsultant() != null) {
-                dto.setConsultantFullName(appointment.getConsultant().getFullName());
-                dto.setConsultantEmail(appointment.getConsultant().getEmail());
-            }
-
-            return dto;
-        }).collect(Collectors.toList());
+        return appointmentRepository.findByUserId(userId)
+                .stream().map(this::toAppointmentDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -301,8 +263,8 @@ public class ConsultantServiceImpl implements ConsultantService {
 
     private List<ConsultantAvailableSlotsResponse.TimeSlot> generateTimeSlots() {
         List<ConsultantAvailableSlotsResponse.TimeSlot> slots = new ArrayList<>();
-        LocalTime start = LocalTime.of(8, 0); // ví dụ: bắt đầu 8h sáng
-        LocalTime end = LocalTime.of(17, 0);  // kết thúc 5h chiều
+        LocalTime start = LocalTime.of(8, 0);
+        LocalTime end = LocalTime.of(17, 0);
         int durationMinutes = 45;
 
         while (start.plusMinutes(durationMinutes).isBefore(end.plusSeconds(1))) {
@@ -318,5 +280,24 @@ public class ConsultantServiceImpl implements ConsultantService {
         return slots;
     }
 
+    // ✅ Helper method để tránh lặp lại logic ánh xạ Appointment -> DTO
+    private AppointmentDTO toAppointmentDTO(Appointment appointment) {
+        AppointmentDTO dto = new AppointmentDTO();
+        dto.setId(appointment.getId());
+        dto.setAppointmentTime(appointment.getAppointmentTime());
+        dto.setStatus(appointment.getStatus());
+        dto.setNote(appointment.getNote());
 
+        if (appointment.getUser() != null) {
+            dto.setUserFullName(appointment.getUser().getFullName());
+            dto.setUserEmail(appointment.getUser().getEmail());
+        }
+
+        if (appointment.getConsultant() != null) {
+            dto.setConsultantFullName(appointment.getConsultant().getFullName());
+            dto.setConsultantEmail(appointment.getConsultant().getEmail());
+        }
+
+        return dto;
+    }
 }

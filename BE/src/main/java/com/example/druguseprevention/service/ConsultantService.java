@@ -25,4 +25,5 @@ public interface ConsultantService {
     List<AppointmentDTO> getAppointmentsByUserId(Long userId);
     ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date);
 
+
 }
