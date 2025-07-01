@@ -10,6 +10,7 @@ import com.example.druguseprevention.enums.AssessmentType;
 import com.example.druguseprevention.service.AssessmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -22,11 +23,10 @@ import java.util.List;
 @SecurityRequirement(name = "api")
 public class AssessmentController {
 
-    private final AssessmentService assessmentService;
+    @Autowired
+    private AssessmentService assessmentService;
 
-    /**
-     * Lấy danh sách câu hỏi cho loại đánh giá (CRAFFT / ASSIST)
-     */
+
 
     @GetMapping("/questions/{type}")
     public ResponseEntity<List<AssessmentQuestion>> getQuestions(@PathVariable AssessmentType type) {
@@ -65,9 +65,7 @@ public class AssessmentController {
         return assessmentService.getAllAssessments();
     }
 
-    /**
-     * Người dùng gửi kết quả đánh giá
-     */
+
 
     @PostMapping("/submit")
     public ResponseEntity<AssessmentResultResponse> submitAssessment(

@@ -86,4 +86,11 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Assessment> assessments;
 
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    private List<ProgramParticipation> programParticipations;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<SurveySendHistory> surveySendHistories;
 }
