@@ -4,6 +4,7 @@ import com.example.druguseprevention.entity.Lesson;
 import com.example.druguseprevention.service.LessonService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class LessonController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createLesson(@RequestBody Lesson lesson) {
         return ResponseEntity.ok(lessonService.createLesson(lesson));
     }
@@ -37,11 +39,13 @@ public class LessonController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateLesson(@PathVariable Long id, @RequestBody Lesson lesson) {
         return ResponseEntity.ok(lessonService.updateLesson(id, lesson));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteLesson(@PathVariable Long id) {
         lessonService.deleteLesson(id);
         return ResponseEntity.ok("Deleted successfully");
