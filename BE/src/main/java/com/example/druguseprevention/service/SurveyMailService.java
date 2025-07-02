@@ -1,17 +1,11 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.EmailDetail;
-import com.example.druguseprevention.entity.ProgramParticipation;
-import com.example.druguseprevention.entity.SurveySendHistory;
-import com.example.druguseprevention.entity.SurveyTemplate;
-import com.example.druguseprevention.entity.User;
+import com.example.druguseprevention.entity.*;
 import com.example.druguseprevention.enums.SurveySendStatus;
 import com.example.druguseprevention.enums.SurveyType;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
-import com.example.druguseprevention.repository.ProgramParticipationRepository;
-import com.example.druguseprevention.repository.SurveySendHistoryRepository;
-import com.example.druguseprevention.repository.SurveyTemplateRepository;
-import com.example.druguseprevention.repository.UserRepository;
+import com.example.druguseprevention.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -39,15 +33,24 @@ public class SurveyMailService {
     private SurveySendHistoryRepository surveySendHistoryRepository;
 
     @Autowired
+    private ProgramRepository programRepository;
+
+    @Autowired
     TemplateEngine templateEngine;
 
     public void sendSurveyToParticipants(Long programId, SurveyType type) {
+        Program program = programRepository.findByIdAndIsDeletedFalse(programId)
+                .orElseThrow(() -> new BadRequestException("Program not found"));
+
+        // Tìm template theo chương trình và loại
+        SurveyTemplate template = surveyTemplateRepository.findByProgramIdAndTypeAndIsDeletedFalse(programId, type)
+                .orElseThrow(() -> new BadRequestException("Survey template not found for this program and type"));
+
         List<ProgramParticipation> participations = participationRepository.findByProgramId(programId);
-        SurveyTemplate template = surveyTemplateRepository.findByTypeAndIsDeletedFalse(type)
-                .orElseThrow(() -> new BadRequestException("Survey template not found"));
 
         for (ProgramParticipation p : participations) {
             User user = p.getMember();
+
             EmailDetail emailDetail = new EmailDetail();
             emailDetail.setRecipient(user.getEmail());
             emailDetail.setSubject("Survey: " + template.getName());
@@ -58,31 +61,25 @@ public class SurveyMailService {
             context.setVariable("link", template.getGoogleFormUrl());
             String html = templateEngine.process("surveytemplate", context);
 
+            SurveySendHistory history = new SurveySendHistory();
+            history.setUser(user);
+            history.setProgram(program);
+            history.setTemplate(template);
+            history.setTemplateType(type);
+            history.setFormUrl(template.getGoogleFormUrl());
+            history.setSentAt(LocalDateTime.now());
+
             try {
                 emailService.sendHtmlEmail(emailDetail, html);
-                // log sent
-                SurveySendHistory history = new SurveySendHistory();
-                history.setUser(user);
-                history.setProgram(p.getProgram());
-                history.setTemplate(template);
-                history.setTemplateType(type);
-                history.setFormUrl(template.getGoogleFormUrl());
-                history.setSentAt(LocalDateTime.now());
                 history.setStatus(SurveySendStatus.SENT);
-                surveySendHistoryRepository.save(history);
             } catch (Exception e) {
-                SurveySendHistory history = new SurveySendHistory();
-                history.setUser(user);
-                history.setProgram(p.getProgram());
-                history.setTemplate(template);
-                history.setTemplateType(type);
-                history.setFormUrl(template.getGoogleFormUrl());
-                history.setSentAt(LocalDateTime.now());
                 history.setStatus(SurveySendStatus.FAILED);
                 history.setErrorMessage(e.getMessage());
-                surveySendHistoryRepository.save(history);
-            } 
+            }
+
+            surveySendHistoryRepository.save(history);
         }
     }
+
 }
 

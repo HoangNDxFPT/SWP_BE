@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface SurveySendHistoryRepository extends JpaRepository<SurveySendHistory, Long> {
     List<SurveySendHistory> findByProgramIdAndTemplateType(Long programId, SurveyType templateType);
+    List<SurveySendHistory> findByUserId (Long id);
+    List<SurveySendHistory> findByProgramId (Long id);
 }

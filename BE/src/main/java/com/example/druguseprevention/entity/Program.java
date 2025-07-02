@@ -23,11 +23,15 @@ public class Program {
     private String location;
     private boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "program")
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<ProgramParticipation> programParticipations;
 
-    @OneToMany(mappedBy = "program")
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SurveySendHistory> surveySendHistories ;
+
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<SurveyTemplate> surveyTemplates;
 }
