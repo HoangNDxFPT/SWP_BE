@@ -23,19 +23,6 @@ public class CourseController {
 //    private final CourseService courseService;
 
 
-    @GetMapping
-    public ResponseEntity<List<Course>> getCourses(@RequestParam(required = false) String name) {
-        return ResponseEntity.ok(courseService.getCourses(name));
-    }
-
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Course> getById(@PathVariable Long id) {
-        Course course = courseService.getCourseById(id);
-        return course != null ? ResponseEntity.ok(course) : ResponseEntity.notFound().build();
-    }
-
-
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Course> create(@RequestBody Course course) {
