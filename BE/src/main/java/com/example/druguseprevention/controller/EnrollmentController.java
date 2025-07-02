@@ -8,10 +8,10 @@ import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.EnrollmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -38,4 +38,25 @@ public class EnrollmentController {
         Enrollment enrolled = enrollmentService.enrollUserInCourse(user, course);
         return ResponseEntity.ok(enrolled);
     }
+    //Lấy danh sách khóa học mà một user đã đăng ký
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<?> getCoursesByUser(@PathVariable Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("User không tồn tại.");
+        }
+        List<Course> courses = enrollmentService.getCoursesByUser(user);
+        return ResponseEntity.ok(courses);
+    }
+    //Lấy danh sách user đã đăng ký một khóa học
+    @GetMapping("/course/{courseId}")
+    public ResponseEntity<?> getUsersByCourse(@PathVariable Long courseId) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (course == null) {
+            return ResponseEntity.badRequest().body("Course không tồn tại.");
+        }
+        List<User> users = enrollmentService.getUsersByCourse(course);
+        return ResponseEntity.ok(users);
+    }
+
 }

@@ -27,6 +27,9 @@ public class Course {
     private LocalDate startDate;
 
     private LocalDate endDate;
+    @Column(name = "duration_in_minutes")
+    private Integer durationInMinutes;
+
 
     @Enumerated(EnumType.STRING)
     private TargetAgeGroup targetAgeGroup;
