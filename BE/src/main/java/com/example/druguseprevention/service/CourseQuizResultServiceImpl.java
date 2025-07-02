@@ -34,11 +34,20 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         CourseQuizResult existing = findById(id);
         existing.setScore(updatedResult.getScore());
         existing.setTotalQuestions(updatedResult.getTotalQuestions());
+        existing.setCourse(updatedResult.getCourse());
+        existing.setUser(updatedResult.getUser());
         return repository.save(existing);
     }
 
     @Override
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public boolean isOwner(Long resultId, Long userId) {
+        return repository.findById(resultId)
+                .map(result -> result.getUser().getId().equals(userId))
+                .orElse(false);
     }
 }
