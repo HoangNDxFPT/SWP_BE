@@ -15,8 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.*;
 
-@SecurityRequirement(name = "api")
-@SecurityRequirement(name = "bearer-key")
+
 @RestController
 @RequestMapping("/api/consultant")
 @RequiredArgsConstructor
@@ -25,22 +24,26 @@ public class ConsultantController {
     private final ConsultantService consultantService;
     private final UserRepository userRepository;
 //    private final FileStorageService fileStorageService;
-
+@SecurityRequirement(name = "api")
+@SecurityRequirement(name = "bearer-key")
     private Long getCurrentUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return consultantService.getUserIdByUsername(username);
     }
-
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     @GetMapping("/dashboard")
     public ResponseEntity<ConsultantDashboardDto> getDashboard() {
         return ResponseEntity.ok(consultantService.getDashboard(getCurrentUserId()));
     }
-
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     @GetMapping("/appointments")
     public ResponseEntity<List<AppointmentDTO>> getAppointments() {
         return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
     }
-
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     @PostMapping("/appointments")
     public ResponseEntity<AppointmentCreatedResponseDto> createAppointment(
             @RequestBody CreateAppointmentDto dto) {
@@ -48,24 +51,27 @@ public class ConsultantController {
         return ResponseEntity.ok(consultantService.createAppointment(consultantId, dto));
     }
 
-
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     @PutMapping("/profile")
     public ResponseEntity<Void> updateConsultantProfile(@RequestBody ConsultantProfileDto profileDto) {
         consultantService.updateProfile(getCurrentUserId(), profileDto);
         return ResponseEntity.ok().build();
     }
 
-
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     @GetMapping("/all-profiles")
     public ResponseEntity<List<UserProfileDto>> getAllMemberProfiles() {
         return ResponseEntity.ok(consultantService.getAllMemberProfiles());
     }
-
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     @GetMapping("/profile")
     public ResponseEntity<ConsultantProfileDto> getConsultantProfile() {
         return ResponseEntity.ok(consultantService.getProfile(getCurrentUserId()));
     }
-}
+
 //    // ✅ Gộp upload image & certificate
 //    @PostMapping("/profile/upload")
 //    public ResponseEntity<Map<String, String>> uploadFile(
@@ -79,7 +85,7 @@ public class ConsultantController {
 //        }
 //    }
 
-//    //  Gộp tải file (image hoặc certificate)
+    //    //  Gộp tải file (image hoặc certificate)
 //    @GetMapping("/uploads/{type}/{fileName:.+}")
 //    public ResponseEntity<Resource> getUploadedFile(
 //            @PathVariable String type,
@@ -96,3 +102,9 @@ public class ConsultantController {
 //        }
 //    }
 //}
+//  PUBLIC: Lấy thông tin profile của 1 consultant bất kỳ (không cần đăng nhập)
+    @GetMapping("/public/{consultantId}")
+    public ResponseEntity<ConsultantPublicProfileDto> getPublicProfile(@PathVariable Long id) {
+        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(id));
+    }
+}

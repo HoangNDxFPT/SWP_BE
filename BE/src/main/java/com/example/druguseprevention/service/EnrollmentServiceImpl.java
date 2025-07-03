@@ -1,5 +1,6 @@
 package com.example.druguseprevention.service;
 
+import com.example.druguseprevention.dto.EnrollmentDto;
 import com.example.druguseprevention.entity.Course;
 import com.example.druguseprevention.entity.Enrollment;
 import com.example.druguseprevention.entity.EnrollmentId;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,6 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public Enrollment enrollUserToCourse(Long courseId) {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
 
@@ -75,4 +76,64 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     public List<User> getUsersByCourse(Course course) {
         return enrollmentRepository.findUsersByCourse(course);
     }
+
+    @Override
+    public List<EnrollmentDto> getEnrollmentDtosByUser(User user) {
+        return enrollmentRepository.findByMember(user).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EnrollmentDto> getEnrollmentDtosByCourse(Course course) {
+        return enrollmentRepository.findByCourse(course).stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Enrollment updateEnrollment(User user, Course oldCourse, Course newCourse) {
+        EnrollmentId oldId = new EnrollmentId(user.getId(), oldCourse.getId());
+        enrollmentRepository.deleteById(oldId);
+
+        EnrollmentId newId = new EnrollmentId(user.getId(), newCourse.getId());
+        Enrollment enrollment = Enrollment.builder()
+                .id(newId)
+                .member(user)
+                .course(newCourse)
+                .enrollDate(LocalDateTime.now())
+                .status(Enrollment.Status.InProgress)
+                .build();
+
+        return enrollmentRepository.save(enrollment);
+    }
+
+    @Override
+    public boolean unenrollUserFromCourse(User user, Course course) {
+        EnrollmentId id = new EnrollmentId(user.getId(), course.getId());
+        if (enrollmentRepository.existsById(id)) {
+            enrollmentRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    // ✨ Mapping từ Entity sang DTO
+    private EnrollmentDto mapToDto(Enrollment enrollment) {
+        EnrollmentDto dto = new EnrollmentDto();
+
+        User user = enrollment.getMember();
+        Course course = enrollment.getCourse();
+
+        dto.setId(enrollment.getId());
+        dto.setUserId(user != null ? user.getId() : null);
+        dto.setUserName(user != null ? user.getFullName() : null);
+        dto.setCourseId(course != null ? course.getId() : null);
+        dto.setCourseName(course != null ? course.getName() : null);
+        dto.setStatus(enrollment.getStatus() != null ? enrollment.getStatus().name() : null);
+        dto.setEnrolledAt(enrollment.getEnrollDate());
+
+        return dto;
+    }
 }
+

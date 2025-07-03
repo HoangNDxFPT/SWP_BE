@@ -300,4 +300,32 @@ public class ConsultantServiceImpl implements ConsultantService {
 
         return dto;
     }
+
+    @Override
+    public ConsultantPublicProfileDto getPublicConsultantProfile(Long consultantId) {
+        User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
+
+        if (user.getRole() != Role.CONSULTANT) {
+            throw new RuntimeException("Người dùng không phải là tư vấn viên");
+        }
+
+        ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
+
+        ConsultantPublicProfileDto dto = new ConsultantPublicProfileDto();
+        dto.setConsultantId(consultantId);
+        dto.setFullName(user.getFullName());
+
+        if (detail != null) {
+            dto.setDegree(detail.getDegree());
+            dto.setInformation(detail.getInformation());
+            dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
+            dto.setStatus(detail.getStatus());
+        }
+
+        dto.setAddress(user.getAddress()); // có thể ẩn bớt nếu quá riêng tư
+
+        return dto;
+
+    }
 }

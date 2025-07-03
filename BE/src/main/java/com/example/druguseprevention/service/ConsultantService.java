@@ -24,6 +24,6 @@ public interface ConsultantService {
     ConsultantProfileDto getProfile(Long consultantId);
     List<AppointmentDTO> getAppointmentsByUserId(Long userId);
     ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date);
-
+    ConsultantPublicProfileDto getPublicConsultantProfile(Long consultantId);
 
 }
