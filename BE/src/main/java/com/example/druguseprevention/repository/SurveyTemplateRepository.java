@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface SurveyTemplateRepository extends JpaRepository<SurveyTemplate, Long> {
     List<SurveyTemplate> findByIsDeletedFalse();
     Optional<SurveyTemplate> findByIdAndIsDeletedFalse(Long id);
-    Optional<SurveyTemplate> findByTypeAndIsDeletedFalse(SurveyType type);
+    Optional<SurveyTemplate> findByProgramIdAndTypeAndIsDeletedFalse(Long programId, SurveyType type);
 }

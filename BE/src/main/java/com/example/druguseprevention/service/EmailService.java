@@ -25,8 +25,8 @@ public class EmailService {
 
             Context context = new Context();
             context.setVariable("name", user.getFullName());
-            context.setVariable("button", "Test");
-            context.setVariable("link", "test");
+            context.setVariable("button", "Login");
+            context.setVariable("link", "http://localhost:5173/login");
             String html = templateEngine.process("emailtemplate", context);
 
             // Creating a simple mail message

@@ -30,9 +30,16 @@ public class SurveyTemplate {
     @Column(columnDefinition = "TEXT")
     private String googleFormUrl;
 
+    @Column(columnDefinition = "TEXT")
+    private String googleSheetUrl;
+
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "template")
+    @ManyToOne
+    @JoinColumn(name = "program_id")
+    private Program program;
+
+    @OneToMany(mappedBy = "template", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<SurveySendHistory> surveySendHistories;
 }

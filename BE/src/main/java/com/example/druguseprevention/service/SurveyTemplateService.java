@@ -1,6 +1,7 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.entity.SurveyTemplate;
+import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.SurveyTemplateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ import java.util.Optional;
 public class SurveyTemplateService {
 
     @Autowired
-    SurveyTemplateRepository surveyTemplateRepository;
+    private SurveyTemplateRepository surveyTemplateRepository;
 
     public List<SurveyTemplate> getAllTemplates() {
         return surveyTemplateRepository.findByIsDeletedFalse();
@@ -36,9 +37,11 @@ public class SurveyTemplateService {
                     template.setType(updatedTemplate.getType());
                     template.setDescription(updatedTemplate.getDescription());
                     template.setGoogleFormUrl(updatedTemplate.getGoogleFormUrl());
+                    template.setGoogleSheetUrl(updatedTemplate.getGoogleSheetUrl());
+                    template.setProgram(updatedTemplate.getProgram());
                     return surveyTemplateRepository.save(template);
                 })
-                .orElseThrow(() -> new RuntimeException("Survey Template not found or has been deleted"));
+                .orElseThrow(() -> new BadRequestException("Survey Template not found or has been deleted"));
     }
 
     public void deleteTemplate(Long id) {
