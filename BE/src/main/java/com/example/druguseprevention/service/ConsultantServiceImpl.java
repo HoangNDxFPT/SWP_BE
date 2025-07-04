@@ -284,7 +284,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         return slots;
     }
 
-    // ✅ Helper method để tránh lặp lại logic ánh xạ Appointment -> DTO
+    //  Helper method để tránh lặp lại logic ánh xạ Appointment -> DTO
     private AppointmentDTO toAppointmentDTO(Appointment appointment) {
         AppointmentDTO dto = new AppointmentDTO();
         dto.setId(appointment.getId());

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -152,6 +153,26 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 )
                 .collect(Collectors.toList());
     }
+    public boolean cancelEnrollment(Long userId, Long courseId) {
+        User user = userRepository.findById(userId).orElse(null);
+        Course course = courseRepository.findById(courseId).orElse(null);
+
+        if (user == null || course == null) {
+            return false;
+        }
+
+        Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByMemberAndCourse(user, course);
+        if (enrollmentOpt.isPresent()) {
+            Enrollment enrollment = enrollmentOpt.get();
+            enrollment.setStatus(Enrollment.Status.Cancelled);
+            enrollmentRepository.save(enrollment);
+            return true;
+        }
+
+        return false;
+    }
+
+
 
 }
 

@@ -7,6 +7,7 @@ import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.CourseRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.EnrollmentService;
+import com.example.druguseprevention.service.EnrollmentServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +21,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/enrollments")
 public class EnrollmentController {
-
     private final EnrollmentService enrollmentService;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
@@ -61,13 +61,30 @@ public class EnrollmentController {
         List<EnrollmentDto> enrollments = enrollmentService.getEnrollmentDtosByCourse(course);
         return ResponseEntity.ok(enrollments);
     }
+
     @GetMapping("/my-courses")
     @PreAuthorize("hasRole('MEMBER')")
     public ResponseEntity<?> getMyCourses(@AuthenticationPrincipal User currentUser) {
         List<CourseDto> courses = enrollmentService.getCoursesOfCurrentUser(currentUser);
         return ResponseEntity.ok(courses);
     }
+
+    @PutMapping("/unenroll")
+    public ResponseEntity<?> unenroll(
+            @RequestParam Long userId,
+            @RequestParam Long courseId) {
+
+        boolean success = enrollmentService.cancelEnrollment(userId, courseId);
+
+        if (success) {
+            return ResponseEntity.ok("Huỷ ghi danh thành công.");
+        } else {
+            return ResponseEntity.badRequest().body("User hoặc Course không tồn tại, hoặc chưa ghi danh.");
+        }
+    }
 }
+
+
 //
 //    //  PUT: Cập nhật trạng thái ghi danh hoặc chuyển khóa học
 //    @PutMapping("/update")

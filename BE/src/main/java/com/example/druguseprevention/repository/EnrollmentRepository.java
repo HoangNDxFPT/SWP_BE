@@ -29,4 +29,7 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Enrollme
     // Truy vấn các user đã enroll trong một khóa học
     @Query("SELECT e.member FROM Enrollment e WHERE e.course = :course")
     List<User> findUsersByCourse(@Param("course") Course course);
+
+    List<Enrollment> findByMemberAndStatus(User user, Enrollment.Status status);
+
 }

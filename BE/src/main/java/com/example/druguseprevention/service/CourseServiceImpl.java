@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +60,10 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> getCourseList() {
         return courseRepository.findByIsDeletedFalse(); // Chỉ lấy khóa học chưa bị xóa
     }
+    public Optional<Course> findById(Long id) {
+        return courseRepository.findById(id);
+    }
+
 
 }
 
