@@ -20,6 +20,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ConsultantServiceImpl implements ConsultantService {
+//    @Override
+//    public List<ConsultantPublicProfileDto> getAllPublicConsultantProfiles() {
+//        return List.of();
+//    }
 
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;

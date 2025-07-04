@@ -21,12 +21,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.http.HttpMethod;
+// import org.springframework.web.bind.annotation.GetMapping; // Không cần thiết ở đây
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Arrays;
 import java.io.IOException;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -67,8 +69,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         req -> req
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers("/api/login", "/api/register", "/api/reset-password", "/api/forgot-password").permitAll()
-
+                                // Đã sửa lỗi cú pháp ở đây: liệt kê tất cả các đường dẫn trong một requestMatchers duy nhất
+                                .requestMatchers(
+                                        "/api/login",
+                                        "/api/register",
+                                        "/api/reset-password",
+                                        "/api/forgot-password",
+                                        "/api/consultant/public/**", // Bao gồm cả /api/consultant/public/{id} và /api/consultant/public/all
+                                        "/api/public/all" // Nếu bạn có endpoint này ở gốc /api/public/all
+                                ).permitAll()
                                 // Add Swagger 3 endpoints to permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
@@ -101,5 +110,6 @@ public class SecurityConfig {
             response.getWriter().write("{\"message\": \"Forbidden: " + accessDeniedException.getMessage() + "\"}");
             response.getWriter().flush();
         }
+
     }
 }

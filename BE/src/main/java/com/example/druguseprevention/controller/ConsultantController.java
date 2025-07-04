@@ -103,8 +103,15 @@ public class ConsultantController {
 //    }
 //}
 //  PUBLIC: Lấy thông tin profile của 1 consultant bất kỳ (không cần đăng nhập)
+
     @GetMapping("/public/{consultantId}")
-    public ResponseEntity<ConsultantPublicProfileDto> getPublicProfile(@PathVariable Long id) {
-        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(id));
+    public ResponseEntity<ConsultantPublicProfileDto> getPublicProfile(@PathVariable Long consultantId) {
+        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(consultantId));
     }
+//    @GetMapping("/public/all") // Hoặc chỉ "/public" nếu bạn muốn nó là endpoint mặc định
+//    public ResponseEntity<List<ConsultantPublicProfileDto>> getAllPublicProfiles() {
+//        // Bạn cần một phương thức trong ConsultantService để lấy tất cả hồ sơ công khai
+//        return ResponseEntity.ok(consultantService.getAllPublicConsultantProfiles());
+//    }
 }
+

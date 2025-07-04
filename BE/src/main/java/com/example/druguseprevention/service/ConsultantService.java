@@ -26,4 +26,5 @@ public interface ConsultantService {
     ConsultantAvailableSlotsResponse getAvailableSlots(Long consultantId, LocalDate date);
     ConsultantPublicProfileDto getPublicConsultantProfile(Long consultantId);
 
+//    List<ConsultantPublicProfileDto> getAllPublicConsultantProfiles();
 }

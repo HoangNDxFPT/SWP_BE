@@ -41,7 +41,10 @@ public class Filter extends OncePerRequestFilter {
             "POST:/api/reset-password",
             "GET:/v3/api-docs/**",
             "GET:/swagger-ui/**",
+            "GET:/api/consultant/public/**", // Thêm dòng này
+            "GET:/api/public/all", //
             "GET:/swagger-ui.html"
+
 
 //            "GET:/api/profile/{id}"
 
