@@ -1,5 +1,6 @@
 package com.example.druguseprevention.service;
 
+import com.example.druguseprevention.dto.CourseDto;
 import com.example.druguseprevention.dto.EnrollmentDto;
 import com.example.druguseprevention.entity.Course;
 import com.example.druguseprevention.entity.Enrollment;
@@ -19,4 +20,6 @@ public interface EnrollmentService {
     List<EnrollmentDto> getEnrollmentDtosByCourse(Course course);
     Enrollment updateEnrollment(User user, Course oldCourse, Course newCourse);
     boolean unenrollUserFromCourse(User user, Course course);
+
+    List<CourseDto> getCoursesOfCurrentUser(User currentUser);
 }

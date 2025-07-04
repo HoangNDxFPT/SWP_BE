@@ -1,5 +1,6 @@
 package com.example.druguseprevention.service;
 
+import com.example.druguseprevention.dto.CourseDto;
 import com.example.druguseprevention.dto.EnrollmentDto;
 import com.example.druguseprevention.entity.Course;
 import com.example.druguseprevention.entity.Enrollment;
@@ -135,5 +136,22 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return dto;
     }
+    public List<CourseDto> getCoursesOfCurrentUser(User currentUser) {
+        List<Course> courses = enrollmentRepository.findCoursesByUser(currentUser);
+
+        return courses.stream()
+                .map(course -> CourseDto.builder()
+                        .id(course.getId())
+                        .name(course.getName())
+                        .description(course.getDescription())
+                        .startDate(course.getStartDate())
+                        .endDate(course.getEndDate())
+                        .durationInMinutes(course.getDurationInMinutes())
+                        .url(course.getUrl())
+                        .build()
+                )
+                .collect(Collectors.toList());
+    }
+
 }
 

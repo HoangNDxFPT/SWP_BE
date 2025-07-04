@@ -1,5 +1,6 @@
 package com.example.druguseprevention.controller;
 
+import com.example.druguseprevention.dto.CourseDto;
 import com.example.druguseprevention.dto.EnrollmentDto;
 import com.example.druguseprevention.entity.Course;
 import com.example.druguseprevention.entity.User;
@@ -9,6 +10,7 @@ import com.example.druguseprevention.service.EnrollmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,6 +60,12 @@ public class EnrollmentController {
         }
         List<EnrollmentDto> enrollments = enrollmentService.getEnrollmentDtosByCourse(course);
         return ResponseEntity.ok(enrollments);
+    }
+    @GetMapping("/my-courses")
+    @PreAuthorize("hasRole('MEMBER')")
+    public ResponseEntity<?> getMyCourses(@AuthenticationPrincipal User currentUser) {
+        List<CourseDto> courses = enrollmentService.getCoursesOfCurrentUser(currentUser);
+        return ResponseEntity.ok(courses);
     }
 }
 //
