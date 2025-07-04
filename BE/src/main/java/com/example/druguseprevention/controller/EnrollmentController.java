@@ -8,6 +8,7 @@ import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.EnrollmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class EnrollmentController {
     }
 
     @GetMapping("/course/{courseId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getEnrollmentsByCourse(@PathVariable Long courseId) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
