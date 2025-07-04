@@ -42,14 +42,14 @@ public class ConsultantController {
     public ResponseEntity<List<AppointmentDTO>> getAppointments() {
         return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
     }
-    @SecurityRequirement(name = "api")
-    @SecurityRequirement(name = "bearer-key")
-    @PostMapping("/appointments")
-    public ResponseEntity<AppointmentCreatedResponseDto> createAppointment(
-            @RequestBody CreateAppointmentDto dto) {
-        Long consultantId = getCurrentUserId();
-        return ResponseEntity.ok(consultantService.createAppointment(consultantId, dto));
-    }
+//    @SecurityRequirement(name = "api")
+//    @SecurityRequirement(name = "bearer-key")
+//    @PostMapping("/appointments")
+//    public ResponseEntity<AppointmentCreatedResponseDto> createAppointment(
+//            @RequestBody CreateAppointmentDto dto) {
+//        Long consultantId = getCurrentUserId();
+//        return ResponseEntity.ok(consultantService.createAppointment(consultantId, dto));
+//    }
 
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
