@@ -37,7 +37,7 @@ public class CourseQuizController {
         return quizService.updateQuiz(id, dto);
     }
 
-    // ✅ API: Lấy danh sách courseId đã hoàn thành (điểm >= 60%)
+    // API: Lấy danh sách courseId đã hoàn thành (điểm >= 60%)
     @GetMapping("/completed/{userId}")
     public List<Long> getCompletedCourses(@PathVariable Long userId) {
         return quizService.getCompletedCourseIdsByUserId(userId);

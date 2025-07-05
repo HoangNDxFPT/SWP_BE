@@ -30,18 +30,18 @@ public class ConsultantController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return consultantService.getUserIdByUsername(username);
     }
-    @SecurityRequirement(name = "api")
-    @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/dashboard")
-    public ResponseEntity<ConsultantDashboardDto> getDashboard() {
-        return ResponseEntity.ok(consultantService.getDashboard(getCurrentUserId()));
-    }
-    @SecurityRequirement(name = "api")
-    @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/appointments")
-    public ResponseEntity<List<AppointmentDTO>> getAppointments() {
-        return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
-    }
+//    @SecurityRequirement(name = "api")
+//    @SecurityRequirement(name = "bearer-key")
+//    @GetMapping("/dashboard")
+//    public ResponseEntity<ConsultantDashboardDto> getDashboard() {
+//        return ResponseEntity.ok(consultantService.getDashboard(getCurrentUserId()));
+//    }
+//    @SecurityRequirement(name = "api")
+//    @SecurityRequirement(name = "bearer-key")
+//    @GetMapping("/appointments")
+//    public ResponseEntity<List<AppointmentDTO>> getAppointments() {
+//        return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
+//    }
 //    @SecurityRequirement(name = "api")
 //    @SecurityRequirement(name = "bearer-key")
 //    @PostMapping("/appointments")
