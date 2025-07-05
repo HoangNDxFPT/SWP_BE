@@ -60,11 +60,8 @@ public class CourseServiceImpl implements CourseService {
     public List<Course> getCourseList() {
         return courseRepository.findByIsDeletedFalse(); // Chỉ lấy khóa học chưa bị xóa
     }
+
     public Optional<Course> findById(Long id) {
         return courseRepository.findById(id);
     }
-
-
 }
-
-
