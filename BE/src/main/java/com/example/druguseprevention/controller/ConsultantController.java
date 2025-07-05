@@ -23,33 +23,15 @@ public class ConsultantController {
 
     private final ConsultantService consultantService;
     private final UserRepository userRepository;
-//    private final FileStorageService fileStorageService;
-@SecurityRequirement(name = "api")
-@SecurityRequirement(name = "bearer-key")
+
+    //    private final FileStorageService fileStorageService;
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
     private Long getCurrentUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return consultantService.getUserIdByUsername(username);
     }
-    @SecurityRequirement(name = "api")
-    @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/dashboard")
-    public ResponseEntity<ConsultantDashboardDto> getDashboard() {
-        return ResponseEntity.ok(consultantService.getDashboard(getCurrentUserId()));
-    }
-    @SecurityRequirement(name = "api")
-    @SecurityRequirement(name = "bearer-key")
-    @GetMapping("/appointments")
-    public ResponseEntity<List<AppointmentDTO>> getAppointments() {
-        return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
-    }
-//    @SecurityRequirement(name = "api")
-//    @SecurityRequirement(name = "bearer-key")
-//    @PostMapping("/appointments")
-//    public ResponseEntity<AppointmentCreatedResponseDto> createAppointment(
-//            @RequestBody CreateAppointmentDto dto) {
-//        Long consultantId = getCurrentUserId();
-//        return ResponseEntity.ok(consultantService.createAppointment(consultantId, dto));
-//    }
+
 
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
@@ -65,6 +47,7 @@ public class ConsultantController {
     public ResponseEntity<List<UserProfileDto>> getAllMemberProfiles() {
         return ResponseEntity.ok(consultantService.getAllMemberProfiles());
     }
+
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/profile")
@@ -72,7 +55,33 @@ public class ConsultantController {
         return ResponseEntity.ok(consultantService.getProfile(getCurrentUserId()));
     }
 
-//    // ✅ Gộp upload image & certificate
+    @GetMapping("/public/{consultantId}")
+    public ResponseEntity<ConsultantPublicProfileDto> getPublicProfile(@PathVariable Long consultantId) {
+        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(consultantId));
+    }
+}
+
+    //    @SecurityRequirement(name = "api")
+//    @SecurityRequirement(name = "bearer-key")
+//    @GetMapping("/dashboard")
+//    public ResponseEntity<ConsultantDashboardDto> getDashboard() {
+//        return ResponseEntity.ok(consultantService.getDashboard(getCurrentUserId()));
+//    }
+//    @SecurityRequirement(name = "api")
+//    @SecurityRequirement(name = "bearer-key")
+//    @GetMapping("/appointments")
+//    public ResponseEntity<List<AppointmentDTO>> getAppointments() {
+//        return ResponseEntity.ok(consultantService.getAppointments(getCurrentUserId()));
+//    }
+//    @SecurityRequirement(name = "api")
+//    @SecurityRequirement(name = "bearer-key")
+//    @PostMapping("/appointments")
+//    public ResponseEntity<AppointmentCreatedResponseDto> createAppointment(
+//            @RequestBody CreateAppointmentDto dto) {
+//        Long consultantId = getCurrentUserId();
+//        return ResponseEntity.ok(consultantService.createAppointment(consultantId, dto));
+//    }
+//    //  Gộp upload image & certificate
 //    @PostMapping("/profile/upload")
 //    public ResponseEntity<Map<String, String>> uploadFile(
 //            @RequestParam("type") String type,
@@ -104,14 +113,11 @@ public class ConsultantController {
 //}
 //  PUBLIC: Lấy thông tin profile của 1 consultant bất kỳ (không cần đăng nhập)
 
-    @GetMapping("/public/{consultantId}")
-    public ResponseEntity<ConsultantPublicProfileDto> getPublicProfile(@PathVariable Long consultantId) {
-        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(consultantId));
-    }
+
 //    @GetMapping("/public/all") // Hoặc chỉ "/public" nếu bạn muốn nó là endpoint mặc định
 //    public ResponseEntity<List<ConsultantPublicProfileDto>> getAllPublicProfiles() {
 //        // Bạn cần một phương thức trong ConsultantService để lấy tất cả hồ sơ công khai
 //        return ResponseEntity.ok(consultantService.getAllPublicConsultantProfiles());
 //    }
-}
+
 
