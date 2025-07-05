@@ -93,4 +93,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<SurveySendHistory> surveySendHistories;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<UserSlot> userSlots;
 }
