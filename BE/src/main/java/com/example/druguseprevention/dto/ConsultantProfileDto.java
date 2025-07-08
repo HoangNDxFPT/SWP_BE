@@ -13,4 +13,5 @@ public class ConsultantProfileDto {
     private String information;
     private String certifiedDegree;
     private String certifiedDegreeImage;
+    private String googleMeetLink;
 }

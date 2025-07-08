@@ -21,18 +21,18 @@ public class ConsultantServiceImpl implements ConsultantService {
 
     @Override
     public void updateProfile(Long consultantId, ConsultantProfileDto dto) {
-        User user = userRepository.findById(consultantId)
+        User consultant = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
 
-        user.setFullName(dto.getFullName());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setAddress(dto.getAddress());
-        userRepository.save(user);
+        consultant.setFullName(dto.getFullName());
+        consultant.setPhoneNumber(dto.getPhoneNumber());
+        consultant.setAddress(dto.getAddress());
+        userRepository.save(consultant);
 
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
         if (detail == null) {
             detail = new ConsultantDetail();
-            detail.setUser(user);
+            detail.setConsultant(consultant);
         }
 
         detail.setStatus(dto.getStatus());
@@ -40,6 +40,8 @@ public class ConsultantServiceImpl implements ConsultantService {
         detail.setInformation(dto.getInformation());
         detail.setCertifiedDegree(dto.getCertifiedDegree());
         detail.setCertifiedDegreeImage(dto.getCertifiedDegreeImage());
+        // thêm phần này
+        detail.setGoogleMeetLink(dto.getGoogleMeetLink());
 
         consultantDetailRepository.save(detail);
     }
@@ -67,6 +69,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setInformation(detail.getInformation());
             dto.setCertifiedDegree(detail.getCertifiedDegree());
             dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
+            dto.setGoogleMeetLink(detail.getGoogleMeetLink());
         }
 
         return dto;
