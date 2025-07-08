@@ -19,8 +19,6 @@ public class CourseQuizResultController {
 
     private final CourseQuizResultService service;
 
-    //  User và Admin đều được phép tạo
-    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     @PostMapping
     public ResponseEntity<CourseQuizResult> create(@RequestBody CourseQuizResult result) {
         return ResponseEntity.ok(service.create(result));
