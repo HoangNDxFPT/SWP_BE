@@ -28,7 +28,7 @@ public class LessonProgress {
     //  Đã học xong video/tài liệu
     private boolean completed;
 
-    //  Đã vượt qua bài quiz của bài học
-    private boolean quizPassed;
+//    //  Đã vượt qua bài quiz của bài học
+//    private boolean quizPassed;
 }
 

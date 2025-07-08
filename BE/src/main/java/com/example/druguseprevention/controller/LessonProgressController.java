@@ -37,6 +37,7 @@ public class LessonProgressController {
 //    }
 
     //  Xem toàn bộ tiến trình học của người dùng
+    
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<LessonProgress>> getUserProgress(@PathVariable Long userId) {
         return ResponseEntity.ok(service.getUserProgress(userId));
