@@ -171,6 +171,35 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return false;
     }
+    @Override
+    public Enrollment reEnrollUserToCourse(User user, Long courseId) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new RuntimeException("Course not found"));
+
+        EnrollmentId id = new EnrollmentId(user.getId(), courseId);
+        Optional<Enrollment> existing = enrollmentRepository.findById(id);
+
+        if (existing.isPresent()) {
+            Enrollment enrollment = existing.get();
+            if (enrollment.getStatus() == Enrollment.Status.Cancelled) {
+                enrollment.setStatus(Enrollment.Status.InProgress);
+                enrollment.setEnrollDate(LocalDateTime.now());
+                return enrollmentRepository.saveAndFlush(enrollment); // Force update
+            } else {
+                throw new RuntimeException("Bạn đã đăng ký rồi.");
+            }
+        }
+
+        Enrollment newEnrollment = Enrollment.builder()
+                .id(id)
+                .member(user)
+                .course(course)
+                .enrollDate(LocalDateTime.now())
+                .status(Enrollment.Status.InProgress)
+                .build();
+
+        return enrollmentRepository.save(newEnrollment);
+    }
 
 
 

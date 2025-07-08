@@ -3,18 +3,22 @@ package com.example.druguseprevention.controller;
 import com.example.druguseprevention.dto.CourseDto;
 import com.example.druguseprevention.dto.EnrollmentDto;
 import com.example.druguseprevention.entity.Course;
+import com.example.druguseprevention.entity.Enrollment;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.CourseRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.EnrollmentService;
 import com.example.druguseprevention.service.EnrollmentServiceImpl;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
@@ -82,7 +86,24 @@ public class EnrollmentController {
             return ResponseEntity.badRequest().body("User hoặc Course không tồn tại, hoặc chưa ghi danh.");
         }
     }
+    @PostMapping("/enrollment/re-enroll")
+    public ResponseEntity<?> reEnroll(@RequestParam Long courseId) {
+        try {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Enrollment enrollment = enrollmentService.reEnrollUserToCourse(user, courseId);
+            return ResponseEntity.ok().body(Map.of("message", "Đăng ký lại thành công", "status", enrollment.getStatus()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }
+
+
+
+
+
+
 
 
 //
