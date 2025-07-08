@@ -20,6 +20,7 @@ public class Lesson {
 
     private String title;
 
+    @Column(columnDefinition = "LONGTEXT")
     private String content; // có thể là mô tả hoặc URL video hoặc dạng HTML
 
     private String materialUrl; // tài liệu đính kèm (nếu có)
