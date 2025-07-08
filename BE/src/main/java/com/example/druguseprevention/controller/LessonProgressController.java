@@ -26,15 +26,15 @@ public class LessonProgressController {
         return ResponseEntity.ok(service.completeLesson(userId, lessonId));
     }
 
-    // Gửi kết quả quiz
-    @PostMapping("/quiz")
-    public ResponseEntity<LessonProgress> submitQuiz(
-            @RequestParam Long userId,
-            @RequestParam Long lessonId,
-            @RequestParam boolean passed
-    ) {
-        return ResponseEntity.ok(service.submitQuiz(userId, lessonId, passed));
-    }
+//    // Gửi kết quả quiz
+//    @PostMapping("/quiz")
+//    public ResponseEntity<LessonProgress> submitQuiz(
+//            @RequestParam Long userId,
+//            @RequestParam Long lessonId,
+//            @RequestParam boolean passed
+//    ) {
+//        return ResponseEntity.ok(service.submitQuiz(userId, lessonId, passed));
+//    }
 
     //  Xem toàn bộ tiến trình học của người dùng
     @GetMapping("/user/{userId}")
