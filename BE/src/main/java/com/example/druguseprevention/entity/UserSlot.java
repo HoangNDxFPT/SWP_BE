@@ -17,8 +17,8 @@ public class UserSlot
     private LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "ussr_id")
-    private User user;
+    @JoinColumn(name = "consultant_id")
+    private User consultant;
 
     @ManyToOne
     @JoinColumn(name ="slot_id")
@@ -26,4 +26,7 @@ public class UserSlot
 
     private boolean isAvailable = true;
 
+
+    @OneToOne(mappedBy = "userSlot", cascade = CascadeType.ALL)
+    private Appointment appointment;
 }

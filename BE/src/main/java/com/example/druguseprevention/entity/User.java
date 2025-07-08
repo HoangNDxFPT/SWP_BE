@@ -94,7 +94,11 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<SurveySendHistory> surveySendHistories;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "consultant")
     @JsonIgnore
     private List<UserSlot> userSlots;
+
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    private List<Appointment> appointments;
 }
