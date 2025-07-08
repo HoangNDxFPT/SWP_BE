@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.CourseQuizDto;
 import com.example.druguseprevention.service.CourseQuizService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,16 +24,19 @@ public class CourseQuizController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public CourseQuizDto createQuiz(@RequestBody CourseQuizDto dto) {
         return quizService.createQuiz(dto);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteQuiz(@PathVariable Long id) {
         quizService.deleteQuiz(id);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public CourseQuizDto updateQuiz(@PathVariable Long id, @RequestBody CourseQuizDto dto) {
         return quizService.updateQuiz(id, dto);
     }

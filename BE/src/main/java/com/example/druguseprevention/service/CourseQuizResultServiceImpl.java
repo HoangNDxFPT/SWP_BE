@@ -1,21 +1,38 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.entity.CourseQuizResult;
+import com.example.druguseprevention.entity.Enrollment;
 import com.example.druguseprevention.repository.CourseQuizResultRepository;
+import com.example.druguseprevention.repository.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class CourseQuizResultServiceImpl implements CourseQuizResultService {
 
     private final CourseQuizResultRepository repository;
+    private final EnrollmentRepository enrollmentRepository;  // Thêm dòng này
 
     @Override
     public CourseQuizResult create(CourseQuizResult result) {
-        return repository.save(result);
+        CourseQuizResult savedResult = repository.save(result);
+
+        //  Nếu đạt >= 60%, cập nhật trạng thái khóa học
+        if (result.getScore() >= 0.6 * result.getTotalQuestions()) {
+            Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByMemberAndCourse(
+                    result.getUser(), result.getCourse());
+
+            enrollmentOpt.ifPresent(enrollment -> {
+                enrollment.setStatus(Enrollment.Status.Completed);
+                enrollmentRepository.save(enrollment);
+            });
+        }
+
+        return savedResult;
     }
 
     @Override

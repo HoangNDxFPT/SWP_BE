@@ -19,6 +19,7 @@ public class CourseQuizResultController {
 
     private final CourseQuizResultService service;
 
+    //  User và Admin đều được phép tạo
     @PostMapping
     public ResponseEntity<CourseQuizResult> create(@RequestBody CourseQuizResult result) {
         return ResponseEntity.ok(service.create(result));
@@ -32,7 +33,6 @@ public class CourseQuizResultController {
     }
 
     // Admin hoặc chính chủ user mới được xem
-    @PreAuthorize("hasRole('ADMIN') or @courseQuizResultServiceImpl.isOwner(#id, principal.name)")
     @GetMapping("/{id}")
     public ResponseEntity<CourseQuizResult> getById(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(service.findById(id));
