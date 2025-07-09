@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ConsultantServiceImpl implements ConsultantService {
 
+
     private final UserRepository userRepository;
     private final ConsultantDetailRepository consultantDetailRepository;
 
@@ -121,6 +122,41 @@ public class ConsultantServiceImpl implements ConsultantService {
         }
 
         dto.setAddress(user.getAddress());
+
+        return dto;
+    }
+
+    @Override
+    public ConsultantDetail getConsultantDetailById(Long consultantId) {
+        return consultantDetailRepository.findById(consultantId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy ConsultantDetail với ID: " + consultantId));
+    }
+
+    @Override
+    public void saveConsultantDetail(ConsultantDetail detail) {
+        consultantDetailRepository.save(detail);
+    }
+
+    @Override
+    public List<ConsultantPublicProfileDto> getAllPublicConsultants() {
+        List<ConsultantDetail> consultants = consultantDetailRepository.findByStatus("public");
+        return consultants.stream()
+                .map(this::toPublicProfileDto) // gọi hàm bên dưới
+                .collect(Collectors.toList());
+    }
+
+    private ConsultantPublicProfileDto toPublicProfileDto(ConsultantDetail detail) {
+        ConsultantPublicProfileDto dto = new ConsultantPublicProfileDto();
+        dto.setConsultantId(detail.getConsultantId());
+        dto.setDegree(detail.getDegree());
+        dto.setInformation(detail.getInformation());
+        dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
+        dto.setStatus(detail.getStatus());
+
+        if (detail.getUser() != null) {
+            dto.setFullName(detail.getUser().getFullName());
+            dto.setAddress(detail.getUser().getAddress());
+        }
 
         return dto;
     }

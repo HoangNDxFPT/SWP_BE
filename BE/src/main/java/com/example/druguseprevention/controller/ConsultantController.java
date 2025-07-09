@@ -1,9 +1,13 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.*;
+import com.example.druguseprevention.entity.ConsultantDetail;
 import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.ConsultantService;
 //import com.example.druguseprevention.service.FileStorageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -13,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
-
 
 @RestController
 @RequestMapping("/api/consultant")
@@ -24,14 +30,12 @@ public class ConsultantController {
     private final ConsultantService consultantService;
     private final UserRepository userRepository;
 
-    //    private final FileStorageService fileStorageService;
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
     private Long getCurrentUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return consultantService.getUserIdByUsername(username);
     }
-
 
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
@@ -55,11 +59,38 @@ public class ConsultantController {
         return ResponseEntity.ok(consultantService.getProfile(getCurrentUserId()));
     }
 
-    @GetMapping("/public/{consultantId}")
-    public ResponseEntity<ConsultantPublicProfileDto> getPublicProfile(@PathVariable Long consultantId) {
-        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(consultantId));
+    @GetMapping("/public")
+    public ResponseEntity<List<ConsultantPublicProfileDto>> getAllPublicProfiles() {
+        return ResponseEntity.ok(consultantService.getAllPublicConsultants());
     }
+//    @Operation(summary = "Upload ảnh bằng cấp")
+//    @SecurityRequirement(name = "bearer-key")
+//    @PostMapping(value = "/profile/upload-degree", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<?> uploadCertifiedDegreeImage(@RequestParam("file") MultipartFile file) {
+//        try {
+//            Long consultantId = getCurrentUserId();
+//
+//            String uploadDir = "uploads/certified-degree/";
+//            Files.createDirectories(Paths.get(uploadDir));
+//
+//            String fileName = "degree_" + consultantId + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//            Path filePath = Paths.get(uploadDir + fileName);
+//            file.transferTo(filePath);
+//
+//            ConsultantDetail detail = consultantService.getConsultantDetailById(consultantId);
+//            detail.setCertifiedDegreeImage("/uploads/certified-degree/" + fileName);
+//            consultantService.saveConsultantDetail(detail);
+//
+//            return ResponseEntity.ok(Map.of("message", "Upload thành công", "url", detail.getCertifiedDegreeImage()));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+//        }
+//    }
+
+
 }
+
+
 
     //    @SecurityRequirement(name = "api")
 //    @SecurityRequirement(name = "bearer-key")
