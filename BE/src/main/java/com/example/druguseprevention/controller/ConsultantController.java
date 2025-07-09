@@ -67,9 +67,9 @@ public class ConsultantController {
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/all")
     public ResponseEntity<List<ConsultantPublicProfileDto>> getAllConsultants() {
-        List<ConsultantPublicProfileDto> consultants = consultantService.getAllPublicConsultants();
-        return ResponseEntity.ok(consultants);
+        return ResponseEntity.ok(consultantService.getAllConsultants());
     }
+
 
 //    @Operation(summary = "Upload ảnh bằng cấp")
 //    @SecurityRequirement(name = "bearer-key")

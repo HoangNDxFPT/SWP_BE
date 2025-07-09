@@ -26,20 +26,17 @@ public class ConsultantServiceImpl implements ConsultantService {
         User consultant = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
 
-        // Cập nhật thông tin User
         consultant.setFullName(dto.getFullName());
         consultant.setPhoneNumber(dto.getPhoneNumber());
         consultant.setAddress(dto.getAddress());
         userRepository.save(consultant);
 
-        // Lấy hoặc tạo mới ConsultantDetail
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
         if (detail == null) {
             detail = new ConsultantDetail();
             detail.setConsultant(consultant);
         }
 
-        // Cập nhật các trường trong ConsultantDetail
         detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
         detail.setInformation(dto.getInformation());
@@ -80,6 +77,32 @@ public class ConsultantServiceImpl implements ConsultantService {
     }
 
     @Override
+    public ConsultantPublicProfileDto getPublicConsultantProfile(Long consultantId) {
+        User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
+
+        if (user.getRole() != Role.CONSULTANT) {
+            throw new RuntimeException("Người dùng không phải là tư vấn viên");
+        }
+
+        ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
+
+        ConsultantPublicProfileDto dto = new ConsultantPublicProfileDto();
+        dto.setConsultantId(consultantId);
+        dto.setFullName(user.getFullName());
+        dto.setAddress(user.getAddress());
+
+        if (detail != null) {
+            dto.setDegree(detail.getDegree());
+            dto.setInformation(detail.getInformation());
+            dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
+            dto.setStatus(detail.getStatus());
+        }
+
+        return dto;
+    }
+
+    @Override
     public Long getUserIdByUsername(String username) {
         return userRepository.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"))
@@ -106,33 +129,6 @@ public class ConsultantServiceImpl implements ConsultantService {
     }
 
     @Override
-    public ConsultantPublicProfileDto getPublicConsultantProfile(Long consultantId) {
-        User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
-
-        if (user.getRole() != Role.CONSULTANT) {
-            throw new RuntimeException("Người dùng không phải là tư vấn viên");
-        }
-
-        ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
-
-        ConsultantPublicProfileDto dto = new ConsultantPublicProfileDto();
-        dto.setConsultantId(consultantId);
-        dto.setFullName(user.getFullName());
-
-        if (detail != null) {
-            dto.setDegree(detail.getDegree());
-            dto.setInformation(detail.getInformation());
-            dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
-            dto.setStatus(detail.getStatus());
-        }
-
-        dto.setAddress(user.getAddress());
-
-        return dto;
-    }
-
-    @Override
     public ConsultantDetail getConsultantDetailById(Long consultantId) {
         return consultantDetailRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy ConsultantDetail với ID: " + consultantId));
@@ -144,26 +140,37 @@ public class ConsultantServiceImpl implements ConsultantService {
     }
 
     @Override
-    public List<ConsultantPublicProfileDto> getAllPublicConsultants() {
-        List<ConsultantDetail> consultants = consultantDetailRepository.findByStatus("public");
-        return consultants.stream()
-                .map(this::toPublicProfileDto)
-                .collect(Collectors.toList());
+    public List<ConsultantPublicProfileDto> getAllConsultants() {
+        return getAllConsultantProfiles(); // tái sử dụng logic
     }
 
-    private ConsultantPublicProfileDto toPublicProfileDto(ConsultantDetail detail) {
-        ConsultantPublicProfileDto dto = new ConsultantPublicProfileDto();
-        dto.setConsultantId(detail.getConsultantId());
-        dto.setDegree(detail.getDegree());
-        dto.setInformation(detail.getInformation());
-        dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
-        dto.setStatus(detail.getStatus());
+    @Override
+    public List<ConsultantPublicProfileDto> getAllPublicConsultants() {
+        return getAllConsultantProfiles(); // dùng chung với /public
+    }
 
-        if (detail.getConsultant() != null) {
-            dto.setFullName(detail.getConsultant().getFullName());
-            dto.setAddress(detail.getConsultant().getAddress());
-        }
+    // ✅ Reusable method
+    private List<ConsultantPublicProfileDto> getAllConsultantProfiles() {
+        List<User> consultants = userRepository.findByRoleAndDeletedFalse(Role.CONSULTANT);
 
-        return dto;
+        return consultants.stream()
+                .map(user -> {
+                    ConsultantDetail detail = consultantDetailRepository.findByConsultantId(user.getId());
+
+                    ConsultantPublicProfileDto dto = new ConsultantPublicProfileDto();
+                    dto.setConsultantId(user.getId());
+                    dto.setFullName(user.getFullName());
+                    dto.setAddress(user.getAddress());
+
+                    if (detail != null) {
+                        dto.setDegree(detail.getDegree());
+                        dto.setInformation(detail.getInformation());
+                        dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
+                        dto.setStatus(detail.getStatus());
+                    }
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
