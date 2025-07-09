@@ -76,7 +76,7 @@ public class AppointmentService {
 
 
         // 6. Lấy link Google Meet từ ConsultantDetail
-        ConsultantDetail detail = consultantDetailRepository.findByConsultant(consultant)
+        ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                 .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
         // 7. Trả về response có thông tin meet link
@@ -132,7 +132,7 @@ public class AppointmentService {
         slot.setAppointment(appointment);
 
         // 6. Lấy meet link
-        ConsultantDetail detail = consultantDetailRepository.findByConsultant(consultant)
+        ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                 .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
         // 7. Trả về response
@@ -161,7 +161,7 @@ public class AppointmentService {
                     Slot timeSlot = slot.getSlot();
                     User consultant = slot.getConsultant();
 
-                    ConsultantDetail detail = consultantDetailRepository.findByConsultant(consultant)
+                    ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                             .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
 
@@ -191,7 +191,7 @@ public class AppointmentService {
                     Slot timeSlot = slot.getSlot();
                     User member = appointment.getMember();
 
-                    ConsultantDetail detail = consultantDetailRepository.findByConsultant(consultant)
+                    ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                             .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
                     return new AppointmentResponseForConsultant(
