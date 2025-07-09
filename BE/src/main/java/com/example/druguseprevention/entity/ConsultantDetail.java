@@ -23,11 +23,13 @@ public class ConsultantDetail {
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "consultant_id")
-    private User user;
+    private User consultant;
     @Column(name = "certified_degree")
     private String certifiedDegree;
     @Column(name = "certified_degree_image")
-    private String certifiedDegreeImage; // ✅ đường dẫn ảnh
+    private String certifiedDegreeImage; //  đường dẫn ảnh
 
+    @Column(columnDefinition = "TEXT")
+    private String googleMeetLink;
 
 }
