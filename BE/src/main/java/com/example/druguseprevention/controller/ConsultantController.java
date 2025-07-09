@@ -63,6 +63,14 @@ public class ConsultantController {
     public ResponseEntity<List<ConsultantPublicProfileDto>> getAllPublicProfiles() {
         return ResponseEntity.ok(consultantService.getAllPublicConsultants());
     }
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
+    @GetMapping("/all")
+    public ResponseEntity<List<ConsultantPublicProfileDto>> getAllConsultants() {
+        List<ConsultantPublicProfileDto> consultants = consultantService.getAllPublicConsultants();
+        return ResponseEntity.ok(consultants);
+    }
+
 //    @Operation(summary = "Upload ảnh bằng cấp")
 //    @SecurityRequirement(name = "bearer-key")
 //    @PostMapping(value = "/profile/upload-degree", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

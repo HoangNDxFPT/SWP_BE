@@ -25,4 +25,6 @@ public interface EnrollmentService {
 
     boolean cancelEnrollment(Long userId, Long courseId);
     Enrollment reEnrollUserToCourse(User user, Long courseId);
+    List<EnrollmentDto> getAllEnrollmentDtos();
+
 }

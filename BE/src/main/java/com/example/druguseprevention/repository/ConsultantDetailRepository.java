@@ -8,5 +8,6 @@ import java.util.List;
 public interface ConsultantDetailRepository extends JpaRepository<ConsultantDetail, Long> {
     ConsultantDetail findByConsultantId(Long consultantId);
 
-    List<ConsultantDetail> findByStatus(String aPublic);
+    List<ConsultantDetail> findByStatus(String status);
+
 }

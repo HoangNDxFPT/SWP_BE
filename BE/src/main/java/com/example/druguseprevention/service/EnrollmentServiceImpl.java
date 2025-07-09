@@ -137,6 +137,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return dto;
     }
+
     public List<CourseDto> getCoursesOfCurrentUser(User currentUser) {
         List<Course> courses = enrollmentRepository.findCoursesByUser(currentUser);
 
@@ -153,6 +154,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 )
                 .collect(Collectors.toList());
     }
+
     public boolean cancelEnrollment(Long userId, Long courseId) {
         User user = userRepository.findById(userId).orElse(null);
         Course course = courseRepository.findById(courseId).orElse(null);
@@ -171,6 +173,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return false;
     }
+
     @Override
     public Enrollment reEnrollUserToCourse(User user, Long courseId) {
         Course course = courseRepository.findById(courseId)
@@ -200,6 +203,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
         return enrollmentRepository.save(newEnrollment);
     }
+
+    @Override
+    public List<EnrollmentDto> getAllEnrollmentDtos() {
+        List<Enrollment> enrollments = enrollmentRepository.findAll();
+
+        return enrollments.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
 
 
 

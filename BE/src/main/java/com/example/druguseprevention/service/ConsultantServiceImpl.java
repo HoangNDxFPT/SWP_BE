@@ -1,6 +1,8 @@
 package com.example.druguseprevention.service;
 
-import com.example.druguseprevention.dto.*;
+import com.example.druguseprevention.dto.ConsultantProfileDto;
+import com.example.druguseprevention.dto.ConsultantPublicProfileDto;
+import com.example.druguseprevention.dto.UserProfileDto;
 import com.example.druguseprevention.entity.ConsultantDetail;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Role;
@@ -16,7 +18,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ConsultantServiceImpl implements ConsultantService {
 
-
     private final UserRepository userRepository;
     private final ConsultantDetailRepository consultantDetailRepository;
 
@@ -25,23 +26,25 @@ public class ConsultantServiceImpl implements ConsultantService {
         User consultant = userRepository.findById(consultantId)
                 .orElseThrow(() -> new RuntimeException("Consultant not found"));
 
+        // Cập nhật thông tin User
         consultant.setFullName(dto.getFullName());
         consultant.setPhoneNumber(dto.getPhoneNumber());
         consultant.setAddress(dto.getAddress());
         userRepository.save(consultant);
 
+        // Lấy hoặc tạo mới ConsultantDetail
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
         if (detail == null) {
             detail = new ConsultantDetail();
             detail.setConsultant(consultant);
         }
 
+        // Cập nhật các trường trong ConsultantDetail
         detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
         detail.setInformation(dto.getInformation());
         detail.setCertifiedDegree(dto.getCertifiedDegree());
         detail.setCertifiedDegreeImage(dto.getCertifiedDegreeImage());
-        // thêm phần này
         detail.setGoogleMeetLink(dto.getGoogleMeetLink());
 
         consultantDetailRepository.save(detail);
@@ -144,7 +147,7 @@ public class ConsultantServiceImpl implements ConsultantService {
     public List<ConsultantPublicProfileDto> getAllPublicConsultants() {
         List<ConsultantDetail> consultants = consultantDetailRepository.findByStatus("public");
         return consultants.stream()
-                .map(this::toPublicProfileDto) // gọi hàm bên dưới
+                .map(this::toPublicProfileDto)
                 .collect(Collectors.toList());
     }
 
@@ -156,9 +159,9 @@ public class ConsultantServiceImpl implements ConsultantService {
         dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
         dto.setStatus(detail.getStatus());
 
-        if (detail.getUser() != null) {
-            dto.setFullName(detail.getUser().getFullName());
-            dto.setAddress(detail.getUser().getAddress());
+        if (detail.getConsultant() != null) {
+            dto.setFullName(detail.getConsultant().getFullName());
+            dto.setAddress(detail.getConsultant().getAddress());
         }
 
         return dto;

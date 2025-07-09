@@ -96,7 +96,12 @@ public class EnrollmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }
-
+    @GetMapping("/all-enrollments")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<EnrollmentDto>> getAllEnrollments() {
+        List<EnrollmentDto> enrollmentDtos = enrollmentService.getAllEnrollmentDtos();
+        return ResponseEntity.ok(enrollmentDtos);
+    }
 }
 
 
