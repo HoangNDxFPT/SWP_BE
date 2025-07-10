@@ -1,9 +1,6 @@
 package com.example.druguseprevention.service;
 
-import com.example.druguseprevention.dto.AppointmentRequest;
-import com.example.druguseprevention.dto.AppointmentRequestForConsultant;
-import com.example.druguseprevention.dto.AppointmentResponse;
-import com.example.druguseprevention.dto.AppointmentResponseForConsultant;
+import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.*;
 import com.example.druguseprevention.enums.AppointmentStatus;
 import com.example.druguseprevention.enums.Role;
@@ -72,7 +69,6 @@ public class AppointmentService {
 
         // 5. Đánh dấu slot đã được đặt
         slot.setAvailable(false);
-        slot.setAppointment(appointment);
 
 
         // 6. Lấy link Google Meet từ ConsultantDetail
@@ -129,7 +125,6 @@ public class AppointmentService {
 
         // 5. Đánh dấu slot là đã đặt
         slot.setAvailable(false);
-        slot.setAppointment(appointment);
 
         // 6. Lấy meet link
         ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
@@ -233,9 +228,28 @@ public class AppointmentService {
                     .orElseThrow(() -> new BadRequestException("UserSlot not found"));
 
             managedSlot.setAvailable(true);
-            managedSlot.setAppointment(null);
             userSlotRepository.save(managedSlot);
         }
+    }
+
+    @Transactional
+    public void updateAppointmentStatus(UpdateAppointmentStatusRequest request) {
+        User consultant = userService.getCurrentUser();
+
+
+        Appointment appointment = appointmentRepository
+                .findByIdAndUserSlot_Consultant(request.getAppointmentId(), consultant)
+                .orElseThrow(() -> new BadRequestException("Appointment not found or not assigned to you."));
+
+        //  Không cho cập nhật nếu đã bị cancel hoặc completed
+        if (appointment.getStatus() == AppointmentStatus.CANCELLED ||
+                appointment.getStatus() == AppointmentStatus.COMPLETED) {
+            throw new BadRequestException("Cannot update status of cancelled or completed appointment.");
+        }
+
+        appointment.setStatus(request.getStatus());
+
+        appointmentRepository.save(appointment);
     }
 
 }

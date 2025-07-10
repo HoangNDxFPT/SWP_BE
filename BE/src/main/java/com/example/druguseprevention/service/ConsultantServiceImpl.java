@@ -52,9 +52,9 @@ public class ConsultantServiceImpl implements ConsultantService {
         User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
 
-        if (user.getRole() != Role.CONSULTANT) {
-            throw new RuntimeException("Người dùng không phải là tư vấn viên");
-        }
+//        if (user.getRole() != Role.CONSULTANT) {
+//            throw new RuntimeException("Người dùng không phải là tư vấn viên");
+//        }
 
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
 
