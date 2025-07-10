@@ -8,8 +8,5 @@ public class CourseQuizResultDetailDto {
     private String options;
     private String correctAnswer;
     private String studentAnswer;
-    private boolean isCorrect;
-
-    public void setIsCorrect(boolean correct) {
-    }
+    private boolean isCorrect; // Lombok tự tạo getIsCorrect() và setCorrect() — KHÔNG cần viết tay!
 }
