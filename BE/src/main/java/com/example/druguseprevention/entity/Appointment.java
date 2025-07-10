@@ -30,7 +30,7 @@ public class Appointment {
     @OneToMany(mappedBy = "appointment")
     List<Report> reports;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "user_slot_id")
     private UserSlot userSlot;
 }

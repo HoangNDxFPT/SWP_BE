@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +28,6 @@ public class UserSlot
     private boolean isAvailable = true;
 
 
-    @OneToOne(mappedBy = "userSlot", cascade = CascadeType.ALL)
-    private Appointment appointment;
+    @OneToMany(mappedBy = "userSlot", cascade = CascadeType.ALL)
+    private List<Appointment> appointments;
 }

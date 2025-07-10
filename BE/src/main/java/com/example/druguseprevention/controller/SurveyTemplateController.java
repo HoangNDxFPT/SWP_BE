@@ -5,6 +5,7 @@ import com.example.druguseprevention.service.SurveyTemplateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/survey-templates")
 @SecurityRequirement(name = "api")
+@PreAuthorize("hasRole('ADMIN')")
 public class SurveyTemplateController {
 
     @Autowired
