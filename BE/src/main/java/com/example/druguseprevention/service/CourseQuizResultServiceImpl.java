@@ -1,13 +1,17 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
+import com.example.druguseprevention.dto.QuizAnswerDto;
+import com.example.druguseprevention.dto.QuizSubmitRequest;
 import com.example.druguseprevention.entity.CourseQuizResult;
 import com.example.druguseprevention.entity.CourseQuizResultDetail;
 import com.example.druguseprevention.entity.Enrollment;
+import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.CourseQuizResultDetailRepository;
 import com.example.druguseprevention.repository.CourseQuizResultRepository;
 import com.example.druguseprevention.repository.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
+import com.example.druguseprevention.repository.CourseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +25,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
     private final CourseQuizResultDetailRepository courseQuizResultDetailRepository;
     private final CourseQuizResultRepository courseQuizResultRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final CourseRepository courseRepository;
 
     @Override
     public CourseQuizResult create(CourseQuizResult result) {
@@ -77,6 +82,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
     public List<CourseQuizResult> findByUserId(Long userId) {
         return courseQuizResultRepository.findByUserId(userId);
     }
+
     @Override
     public List<CourseQuizResultDetailDto> getMyResultDetails(Long userId) {
         List<CourseQuizResultDetail> allDetails = courseQuizResultDetailRepository.findAll();
@@ -92,6 +98,27 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
                     return dto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public void submitQuiz(QuizSubmitRequest request, User user) {
+        CourseQuizResult result = new CourseQuizResult();
+        result.setUser(user);
+        result.setCourse(request.getCourseId() != null ? courseRepository.findById(request.getCourseId()).orElseThrow() : null); // sửa tùy vào logic bạn có
+        result.setScore((int) request.getScore());
+        result.setTotalQuestions(request.getAnswers().size());
+        courseQuizResultRepository.save(result);
+
+        for (QuizAnswerDto dto : request.getAnswers()) {
+            CourseQuizResultDetail detail = new CourseQuizResultDetail();
+            detail.setQuestion(dto.getQuestion());
+            detail.setOptions(dto.getOptions());
+            detail.setCorrectAnswer(dto.getCorrectAnswer());
+            detail.setStudentAnswer(dto.getStudentAnswer());
+            detail.setCorrect(dto.getCorrectAnswer().equals(dto.getStudentAnswer()));
+            detail.setQuizResult(result); //  Gán quizResult
+
+            courseQuizResultDetailRepository.save(detail);
+        }
     }
 }
 

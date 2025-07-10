@@ -1,6 +1,7 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
+import com.example.druguseprevention.dto.QuizSubmitRequest;
 import com.example.druguseprevention.entity.CourseQuizResult;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.UserRepository;
@@ -84,6 +85,17 @@ public ResponseEntity<?> getMyResults(Principal principal) {
     }
     return ResponseEntity.ok(results);
 }
+    @PostMapping("/submit")
+    public ResponseEntity<?> submitQuiz(@RequestBody QuizSubmitRequest request, Principal principal) {
+        String username = principal.getName();
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        service.submitQuiz(request, user);
+
+        return ResponseEntity.ok("Đã lưu kết quả bài làm.");
+    }
+
 
 
 
