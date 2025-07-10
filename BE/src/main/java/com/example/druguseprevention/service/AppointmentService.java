@@ -72,7 +72,6 @@ public class AppointmentService {
 
         // 5. Đánh dấu slot đã được đặt
         slot.setAvailable(false);
-        slot.setAppointment(appointment);
 
 
         // 6. Lấy link Google Meet từ ConsultantDetail
@@ -129,7 +128,6 @@ public class AppointmentService {
 
         // 5. Đánh dấu slot là đã đặt
         slot.setAvailable(false);
-        slot.setAppointment(appointment);
 
         // 6. Lấy meet link
         ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
@@ -233,7 +231,6 @@ public class AppointmentService {
                     .orElseThrow(() -> new BadRequestException("UserSlot not found"));
 
             managedSlot.setAvailable(true);
-            managedSlot.setAppointment(null);
             userSlotRepository.save(managedSlot);
         }
     }
