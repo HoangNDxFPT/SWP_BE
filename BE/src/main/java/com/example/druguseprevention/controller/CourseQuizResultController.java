@@ -56,17 +56,36 @@ public class CourseQuizResultController {
         service.delete(id);
         return ResponseEntity.ok("Deleted");
     }
-    @GetMapping("/{id}/details")
-    public ResponseEntity<List<CourseQuizResultDetailDto>> getQuizResultDetails(@PathVariable Long id) {
-        return ResponseEntity.ok(service.getResultDetails(id));
-    }
-    @GetMapping("/my-results")
-    public ResponseEntity<List<CourseQuizResult>> getMyResults(Principal principal) {
+    @GetMapping("/my-details")
+    public ResponseEntity<List<CourseQuizResultDetailDto>> getMyQuizResultDetails(Principal principal) {
         String username = principal.getName();
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return ResponseEntity.ok(service.findByUserId(user.getId()));
+
+        return ResponseEntity.ok(service.getMyResultDetails(user.getId()));
     }
+//
+//    @GetMapping("/my-results")
+//    public ResponseEntity<List<CourseQuizResult>> getMyResults(Principal principal) {
+//        String username = principal.getName();
+//        User user = userRepository.findByUserName(username)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//        return ResponseEntity.ok(service.findByUserId(user.getId()));
+//    }
+@GetMapping("/my-results")
+public ResponseEntity<?> getMyResults(Principal principal) {
+    String username = principal.getName();
+    User user = userRepository.findByUserName(username)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    List<CourseQuizResult> results = service.findByUserId(user.getId());
+    if (results.isEmpty()) {
+        return ResponseEntity.ok("Bạn chưa làm bài quiz nào.");
+    }
+    return ResponseEntity.ok(results);
+}
+
+
 
 
 

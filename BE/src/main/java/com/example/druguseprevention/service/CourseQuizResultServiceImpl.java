@@ -10,7 +10,6 @@ import com.example.druguseprevention.repository.EnrollmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,10 +17,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CourseQuizResultServiceImpl implements CourseQuizResultService {
-    @Override
-    public List<CourseQuizResult> findByUserId(Long userId) {
-        return List.of();
-    }
 
     private final CourseQuizResultDetailRepository courseQuizResultDetailRepository;
     private final CourseQuizResultRepository courseQuizResultRepository;
@@ -79,17 +74,24 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
     }
 
     @Override
-    public List<CourseQuizResultDetailDto> getResultDetails(Long quizResultId) {
-        List<CourseQuizResultDetail> details = courseQuizResultDetailRepository.findByQuizResultId(quizResultId);
-
-        return details.stream().map(detail -> {
-            CourseQuizResultDetailDto dto = new CourseQuizResultDetailDto();
-            dto.setQuestion(detail.getQuestion());
-            dto.setOptions(detail.getOptions());
-            dto.setCorrectAnswer(detail.getCorrectAnswer());
-            dto.setStudentAnswer(detail.getStudentAnswer());
-            dto.setCorrect(detail.isCorrect()); // <-- dùng setCorrect() chứ KHÔNG phải setIsCorrect()
-            return dto;
-        }).collect(Collectors.toList());
+    public List<CourseQuizResult> findByUserId(Long userId) {
+        return courseQuizResultRepository.findByUserId(userId);
+    }
+    @Override
+    public List<CourseQuizResultDetailDto> getMyResultDetails(Long userId) {
+        List<CourseQuizResultDetail> allDetails = courseQuizResultDetailRepository.findAll();
+        return allDetails.stream()
+                .filter(detail -> detail.getQuizResult().getUser().getId().equals(userId))
+                .map(detail -> {
+                    CourseQuizResultDetailDto dto = new CourseQuizResultDetailDto();
+                    dto.setQuestion(detail.getQuestion());
+                    dto.setOptions(detail.getOptions());
+                    dto.setCorrectAnswer(detail.getCorrectAnswer());
+                    dto.setStudentAnswer(detail.getStudentAnswer());
+                    dto.setCorrect(detail.isCorrect());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 }
+

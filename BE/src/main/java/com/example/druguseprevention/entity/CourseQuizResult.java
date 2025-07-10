@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -22,4 +24,7 @@ public class CourseQuizResult {
     private Course course;
 
     private LocalDateTime submittedAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "quizResult", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CourseQuizResultDetail> details = new ArrayList<>();
 }

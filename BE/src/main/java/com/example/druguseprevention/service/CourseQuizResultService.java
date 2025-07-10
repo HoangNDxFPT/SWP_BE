@@ -2,6 +2,7 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
 import com.example.druguseprevention.entity.CourseQuizResult;
+
 import java.util.List;
 
 public interface CourseQuizResultService {
@@ -11,6 +12,6 @@ public interface CourseQuizResultService {
     CourseQuizResult update(Long id, CourseQuizResult updatedResult);
     void delete(Long id);
     boolean isOwner(Long resultId, Long userId);
-    List<CourseQuizResultDetailDto> getResultDetails(Long quizResultId);
     List<CourseQuizResult> findByUserId(Long userId);
+    List<CourseQuizResultDetailDto> getMyResultDetails(Long userId);
 }
