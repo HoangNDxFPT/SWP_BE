@@ -69,6 +69,12 @@ public class ConsultantController {
     public ResponseEntity<List<ConsultantPublicProfileDto>> getAllConsultants() {
         return ResponseEntity.ok(consultantService.getAllConsultants());
     }
+    @GetMapping("/public/{consultantId}")
+    public ResponseEntity<ConsultantPublicProfileDto> getPublicConsultantById(
+            @PathVariable Long consultantId) {
+        return ResponseEntity.ok(consultantService.getPublicConsultantProfile(consultantId));
+    }
+
 
 
 //    @Operation(summary = "Upload ảnh bằng cấp")
