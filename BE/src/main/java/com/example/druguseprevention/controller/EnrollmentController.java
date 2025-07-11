@@ -86,6 +86,7 @@ public class EnrollmentController {
             return ResponseEntity.badRequest().body("User hoặc Course không tồn tại, hoặc chưa ghi danh.");
         }
     }
+
     @PostMapping("/enrollment/re-enroll")
     public ResponseEntity<?> reEnroll(@RequestParam Long courseId) {
         try {
@@ -96,8 +97,9 @@ public class EnrollmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }
+
     @GetMapping("/all-enrollments")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CONSULTANT')")
     public ResponseEntity<List<EnrollmentDto>> getAllEnrollments() {
         List<EnrollmentDto> enrollmentDtos = enrollmentService.getAllEnrollmentDtos();
         return ResponseEntity.ok(enrollmentDtos);

@@ -37,7 +37,6 @@ public class ConsultantServiceImpl implements ConsultantService {
             detail.setConsultant(consultant);
         }
 
-        detail.setStatus(dto.getStatus());
         detail.setDegree(dto.getDegree());
         detail.setInformation(dto.getInformation());
         detail.setCertifiedDegree(dto.getCertifiedDegree());
@@ -65,7 +64,6 @@ public class ConsultantServiceImpl implements ConsultantService {
         dto.setAddress(user.getAddress());
 
         if (detail != null) {
-            dto.setStatus(detail.getStatus());
             dto.setDegree(detail.getDegree());
             dto.setInformation(detail.getInformation());
             dto.setCertifiedDegree(detail.getCertifiedDegree());
@@ -96,7 +94,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setDegree(detail.getDegree());
             dto.setInformation(detail.getInformation());
             dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
-            dto.setStatus(detail.getStatus());
+
         }
 
         return dto;
@@ -166,7 +164,7 @@ public class ConsultantServiceImpl implements ConsultantService {
                         dto.setDegree(detail.getDegree());
                         dto.setInformation(detail.getInformation());
                         dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
-                        dto.setStatus(detail.getStatus());
+
                     }
 
                     return dto;

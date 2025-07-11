@@ -10,6 +10,5 @@ public class ConsultantPublicProfileDto {
     private String degree;
     private String information;
     private String certifiedDegreeImage;
-    private String status;
     private String address ;
 }
