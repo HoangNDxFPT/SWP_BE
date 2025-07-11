@@ -56,7 +56,7 @@ public class EnrollmentController {
     }
 
     @GetMapping("/course/{courseId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CONSULTANT')")
     public ResponseEntity<?> getEnrollmentsByCourse(@PathVariable Long courseId) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {

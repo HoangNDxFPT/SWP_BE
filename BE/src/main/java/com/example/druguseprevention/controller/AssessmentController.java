@@ -60,7 +60,7 @@ public class AssessmentController {
 
     //  Admin xem toàn bộ lịch sử đánh giá của mọi người
     @GetMapping("/all")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CONSULTANT')")
     public List<Assessment> getAllAssessments() {
         return assessmentService.getAllAssessments();
     }
