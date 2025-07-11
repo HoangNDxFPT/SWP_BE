@@ -23,7 +23,7 @@ public class AssessmentResultController {
     @Autowired
     AssessmentResultService assessmentResultService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CONSULTANT')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<AssessmentResultResponse>> getResultsByUserId(@PathVariable Long userId) {
         List<AssessmentResultResponse> responses = assessmentResultService.getResultsByUserId(userId);
