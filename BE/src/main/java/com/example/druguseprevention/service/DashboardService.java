@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
-
+    private final ProgramParticipationRepository programParticipationRepository;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final LessonRepository lessonRepository;
@@ -31,7 +31,8 @@ public class DashboardService {
                 lessonProgressRepository.countByCompletedTrue(), // tên repo có thể khác nếu bạn dùng CourseProgress
                 appointmentRepository.count(),
                 assessmentResultRepository.count(),
-                surveySendHistoryRepository.count()
+                surveySendHistoryRepository.count(),
+                programParticipationRepository.count()
         );
     }
 }

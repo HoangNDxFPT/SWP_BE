@@ -15,4 +15,5 @@ public class DashboardOverviewResponse {
     private long totalAppointments;
     private long totalAssessments;
     private long totalSurveySent;
+    private long totalProgramParticipants;
 }
