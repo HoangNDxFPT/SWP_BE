@@ -2,10 +2,14 @@ package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.RegisterSlotRequest;
 import com.example.druguseprevention.dto.RegisteredSlotDTO;
+import com.example.druguseprevention.dto.RegisteredSlotForConsultantDTO;
+import com.example.druguseprevention.entity.Appointment;
 import com.example.druguseprevention.entity.Slot;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.entity.UserSlot;
+import com.example.druguseprevention.enums.AppointmentStatus;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
+import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import com.example.druguseprevention.repository.SlotRepository;
 import com.example.druguseprevention.repository.UserSlotRepository;
@@ -16,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +34,8 @@ public class SlotService {
     @Autowired
     UserService userService;
 
+    @Autowired
+    AppointmentRepository appointmentRepository;
 
     public List<Slot> get()
     {
@@ -85,6 +92,48 @@ public class SlotService {
                                     slot.getEnd().toString(),
                                     userSlot.getDate(),
                                     userSlot.isAvailable());
+    }
+
+
+    // lấy ra lịch làm việc của consultant bao gồm slot trống và ko trống
+    public List<RegisteredSlotForConsultantDTO> getRegisteredSlotsForConsultant( LocalDate date) {
+        User consultant = userService.getCurrentUser();
+
+        List<UserSlot> slots = userSlotRepository.findUserSlotsByConsultantAndDate(consultant, date);
+
+        List<RegisteredSlotForConsultantDTO> result = new ArrayList<>();
+
+        for (UserSlot slot : slots) {
+            Optional<Appointment> appointmentOpt = appointmentRepository.findByUserSlotAndStatusIn(
+                    slot,
+                    List.of(AppointmentStatus.PENDING, AppointmentStatus.COMPLETED)
+            );
+
+            String status;
+            String memberName;
+
+            if (appointmentOpt.isPresent()) {
+                Appointment appointment = appointmentOpt.get();
+                status = "ĐÃ ĐẶT";
+                memberName = appointment.getMember().getFullName();
+            } else {
+                status = "CÒN TRỐNG";
+                memberName = null;
+            }
+
+            RegisteredSlotForConsultantDTO dto = new RegisteredSlotForConsultantDTO(
+                    slot.getId(),
+                    date,
+                    slot.getSlot().getStart().toString(),
+                    slot.getSlot().getEnd().toString(),
+                    status,
+                    memberName
+            );
+
+            result.add(dto);
+        }
+
+        return result;
     }
 
     public void generateSlots() {

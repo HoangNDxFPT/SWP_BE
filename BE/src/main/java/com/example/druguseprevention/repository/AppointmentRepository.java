@@ -2,6 +2,7 @@ package com.example.druguseprevention.repository;
 
 import com.example.druguseprevention.entity.Appointment;
 import com.example.druguseprevention.entity.User;
+import com.example.druguseprevention.entity.UserSlot;
 import com.example.druguseprevention.enums.AppointmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Optional<Appointment> findByIdAndMember(Long appointmentId, User member);
     List<Appointment> findAllByUserSlot_ConsultantAndStatus(User consultant, AppointmentStatus status);
     Optional<Appointment> findByIdAndUserSlot_Consultant(Long appointmentId, User consultant);
+    Optional<Appointment> findByUserSlotAndStatusIn(UserSlot slot, List<AppointmentStatus> statuses);
 }

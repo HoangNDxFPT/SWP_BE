@@ -2,6 +2,7 @@ package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.RegisterSlotRequest;
 import com.example.druguseprevention.dto.RegisteredSlotDTO;
+import com.example.druguseprevention.dto.RegisteredSlotForConsultantDTO;
 import com.example.druguseprevention.entity.Slot;
 import com.example.druguseprevention.entity.UserSlot;
 import com.example.druguseprevention.service.SlotService;
@@ -47,7 +48,7 @@ public class SlotController
         return ResponseEntity.ok(userSlots);
     }
 
-    // xem những slot đã đăng kí và còn trống
+    // xem những slot consultant đã đăng kí và còn trống ( Member xem)
     @GetMapping("/registered")
     public ResponseEntity getRegisteredSlots(
             @RequestParam Long consultantId,
@@ -56,6 +57,16 @@ public class SlotController
         List<RegisteredSlotDTO> registeredSlotDTOS = slotService.getRegisteredSlots(consultantId,date);
 
         return ResponseEntity.ok(registeredSlotDTOS);
+    }
+
+    // Xem lịch làm việc theo ngày của tư vấn viên
+    @PreAuthorize("hasRole('CONSULTANT')")
+    @GetMapping("/registered-consultant")
+    public ResponseEntity<List<RegisteredSlotForConsultantDTO>> getRegisteredSlotsForConsultant(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+
+        List<RegisteredSlotForConsultantDTO> registeredSlots = slotService.getRegisteredSlotsForConsultant(date);
+        return ResponseEntity.ok(registeredSlots);
     }
 
 }
