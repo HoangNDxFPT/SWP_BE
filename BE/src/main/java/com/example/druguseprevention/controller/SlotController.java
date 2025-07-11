@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ public class SlotController
     @Autowired
     SlotService slotService;
 
+    @PreAuthorize("hasRole ('ADMIN'')")
     // admin chạy 1 lần duy nhất
     @PostMapping
     public void generateSlot()
@@ -36,6 +38,7 @@ public class SlotController
         return ResponseEntity.ok(slots);
     }
 
+    @PreAuthorize("hasRole('CONSULTANT')")
     // đăng kí lịch làm theo ngày
     @PostMapping("register")
     public ResponseEntity registerSlot(@RequestBody RegisterSlotRequest registerSlotRequest)
@@ -44,7 +47,7 @@ public class SlotController
         return ResponseEntity.ok(userSlots);
     }
 
-    // xem những slot đã đăng kí
+    // xem những slot đã đăng kí và còn trống
     @GetMapping("/registered")
     public ResponseEntity getRegisteredSlots(
             @RequestParam Long consultantId,
