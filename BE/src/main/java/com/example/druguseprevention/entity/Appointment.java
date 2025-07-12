@@ -1,6 +1,7 @@
 package com.example.druguseprevention.entity;
 
 import com.example.druguseprevention.enums.AppointmentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,7 @@ public class Appointment {
 
 
     @OneToMany(mappedBy = "appointment")
+    @JsonIgnore
     List<Report> reports;
 
     @ManyToOne

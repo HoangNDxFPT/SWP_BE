@@ -1,5 +1,6 @@
 package com.example.druguseprevention.entity;
 
+import com.example.druguseprevention.enums.ReportStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -13,22 +14,22 @@ import java.time.LocalDateTime;
 public class Report {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    private Long id;
 
-    String reason;
+    private String reason;
+    private String description;
+    private LocalDateTime createdAt;
 
-    String description;
-
-    LocalDateTime createdAt;
-
+    @Enumerated(EnumType.STRING)
+    private ReportStatus status = ReportStatus.PENDING; // Default status
+    private String adminNote;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
-    User user;
+    private User member;
 
     @ManyToOne
     @JoinColumn(name = "appointment_id")
-    Appointment appointment;
+    private Appointment appointment;
 
 }
