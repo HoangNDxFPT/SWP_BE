@@ -1,6 +1,7 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
+import com.example.druguseprevention.dto.CourseQuizResultDto;
 import com.example.druguseprevention.dto.QuizSubmitRequest;
 import com.example.druguseprevention.entity.CourseQuizResult;
 import com.example.druguseprevention.entity.User;
@@ -19,4 +20,5 @@ public interface CourseQuizResultService {
     void submitQuiz(QuizSubmitRequest request, User user);
 
 
+    List<CourseQuizResultDto> getResultDtosByUserId(Long id);
 }

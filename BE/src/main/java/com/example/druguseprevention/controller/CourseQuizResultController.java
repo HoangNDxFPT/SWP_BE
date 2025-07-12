@@ -2,6 +2,7 @@
 package com.example.druguseprevention.controller;
 
 import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
+import com.example.druguseprevention.dto.CourseQuizResultDto;
 import com.example.druguseprevention.dto.QuizSubmitRequest;
 import com.example.druguseprevention.entity.CourseQuizResult;
 import com.example.druguseprevention.entity.User;
@@ -80,12 +81,13 @@ public class CourseQuizResultController {
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<CourseQuizResult> results = service.findByUserId(user.getId());
+        List<CourseQuizResultDto> results = service.getResultDtosByUserId(user.getId());
         if (results.isEmpty()) {
             return ResponseEntity.ok("Bạn chưa làm bài quiz nào.");
         }
         return ResponseEntity.ok(results);
     }
+
     @PostMapping("/submit")
     public ResponseEntity<?> submitQuiz(@RequestBody QuizSubmitRequest request, Principal principal) {
         String username = principal.getName();

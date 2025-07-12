@@ -1,6 +1,7 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
+import com.example.druguseprevention.dto.CourseQuizResultDto;
 import com.example.druguseprevention.dto.QuizAnswerDto;
 import com.example.druguseprevention.dto.QuizSubmitRequest;
 import com.example.druguseprevention.entity.CourseQuizResult;
@@ -120,4 +121,16 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             courseQuizResultDetailRepository.save(detail);
         }
     }
-}
+        public List<CourseQuizResultDto> getResultDtosByUserId(Long userId) {
+            return courseQuizResultRepository.findByUserId(userId).stream().map(result -> {
+                CourseQuizResultDto dto = new CourseQuizResultDto();
+                dto.setId(result.getId());
+                dto.setScore(result.getScore());
+                dto.setTotalQuestions(result.getTotalQuestions());
+                dto.setCourseName(result.getCourse() != null ? result.getCourse().getName() : null);
+                dto.setSubmittedAt(result.getSubmittedAt() != null ? result.getSubmittedAt().toString() : null);
+                return dto;
+            }).collect(Collectors.toList());
+        }
+
+    }
