@@ -121,4 +121,3 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         }
     }
 }
-
