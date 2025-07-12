@@ -59,14 +59,27 @@ public class SlotController
         return ResponseEntity.ok(registeredSlotDTOS);
     }
 
-    // Xem lịch làm việc theo ngày của tư vấn viên
+    // Xem lịch làm việc theo ngày của chính tư vấn viên đó
     @PreAuthorize("hasRole('CONSULTANT')")
     @GetMapping("/registered-consultant")
     public ResponseEntity<List<RegisteredSlotForConsultantDTO>> getRegisteredSlotsForConsultant(
+            @RequestParam Long consultantId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
 
-        List<RegisteredSlotForConsultantDTO> registeredSlots = slotService.getRegisteredSlotsForConsultant(date);
+        List<RegisteredSlotForConsultantDTO> registeredSlots = slotService.getRegisteredSlotsForConsultant(consultantId, date);
         return ResponseEntity.ok(registeredSlots);
+    }
+
+    // admin xem lịch làm việc của consultant theo ngày hoặc xem tất cả các ngày
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/slots/consultant")
+    public ResponseEntity<List<RegisteredSlotForConsultantDTO>> getSlotsByConsultant(
+            @RequestParam Long consultantId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        if (date != null)
+            return ResponseEntity.ok(slotService.getRegisteredSlotsForConsultant(consultantId, date));
+        else
+            return ResponseEntity.ok(slotService.getRegisteredSlotsForAdmin(consultantId));
     }
 
 }

@@ -96,8 +96,9 @@ public class SlotService {
 
 
     // lấy ra lịch làm việc của consultant bao gồm slot trống và ko trống
-    public List<RegisteredSlotForConsultantDTO> getRegisteredSlotsForConsultant( LocalDate date) {
-        User consultant = userService.getCurrentUser();
+    public List<RegisteredSlotForConsultantDTO> getRegisteredSlotsForConsultant(Long consultantId, LocalDate date) {
+        User consultant = authenticationRepository.findById(consultantId)
+                .orElseThrow(() -> new BadRequestException("Consultant not found"));
 
         List<UserSlot> slots = userSlotRepository.findUserSlotsByConsultantAndDate(consultant, date);
 
@@ -135,6 +136,49 @@ public class SlotService {
 
         return result;
     }
+
+    public List<RegisteredSlotForConsultantDTO> getRegisteredSlotsForAdmin( Long consultantId) {
+        User consultant = authenticationRepository.findById(consultantId)
+                .orElseThrow(() -> new BadRequestException("Consultant not found"));
+
+        List<UserSlot> slots = userSlotRepository.findUserSlotsByConsultant(consultant);
+
+        List<RegisteredSlotForConsultantDTO> result = new ArrayList<>();
+
+        for (UserSlot slot : slots) {
+            Optional<Appointment> appointmentOpt = appointmentRepository.findByUserSlotAndStatusIn(
+                    slot,
+                    List.of(AppointmentStatus.PENDING, AppointmentStatus.COMPLETED)
+            );
+
+            String status;
+            String memberName;
+
+            if (appointmentOpt.isPresent()) {
+                Appointment appointment = appointmentOpt.get();
+                status = "ĐÃ ĐẶT";
+                memberName = appointment.getMember().getFullName();
+            } else {
+                status = "CÒN TRỐNG";
+                memberName = null;
+            }
+
+            RegisteredSlotForConsultantDTO dto = new RegisteredSlotForConsultantDTO(
+                    slot.getId(),
+                    slot.getDate(),
+                    slot.getSlot().getStart().toString(),
+                    slot.getSlot().getEnd().toString(),
+                    status,
+                    memberName
+            );
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
+
 
     public void generateSlots() {
         //generate tu 7h sang toi 17h
