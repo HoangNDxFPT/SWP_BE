@@ -101,4 +101,8 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "member")
     @JsonIgnore
     private List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "member")
+    @JsonIgnore
+    private List<Report> reports;
 }

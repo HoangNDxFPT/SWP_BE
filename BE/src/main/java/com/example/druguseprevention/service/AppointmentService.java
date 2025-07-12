@@ -230,6 +230,7 @@ public class AppointmentService {
             managedSlot.setAvailable(true);
             userSlotRepository.save(managedSlot);
         }
+
     }
 
     @Transactional
