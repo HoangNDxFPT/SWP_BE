@@ -252,4 +252,56 @@ public class AppointmentService {
         appointmentRepository.save(appointment);
     }
 
+    // Admin xem tất cả lịch hẹn (có thể lọc theo ngày, trạng thái, consultant, member)
+    public List<AppointmentAdminResponse> searchAppointments(AppointmentSearchRequest request) {
+        User consultant = null;
+        if (request.getConsultantId() != null) {
+            consultant = authenticationRepository.findById(request.getConsultantId())
+                    .orElseThrow(() -> new BadRequestException("Consultant not found"));
+        }
+
+        User member = null;
+        if (request.getMemberId() != null) {
+            member = authenticationRepository.findById(request.getMemberId())
+                    .orElseThrow(() -> new BadRequestException("Member not found"));
+        }
+
+        List<Appointment> appointments = appointmentRepository.searchAppointments(
+                request.getStatus(), consultant, member, request.getDate()
+        );
+
+        return appointments.stream()
+                .map(this::toAdminResponse)
+                .collect(Collectors.toList());
+    }
+
+    private AppointmentAdminResponse toAdminResponse(Appointment appointment) {
+        UserSlot slot = appointment.getUserSlot();
+        Slot slotInfo = slot.getSlot();
+        return new AppointmentAdminResponse(
+                appointment.getId(),
+                appointment.getCreateAt(),
+                appointment.getStatus(),
+                appointment.getMember().getFullName(),
+                slot.getConsultant().getFullName(),
+                slot.getDate(),
+                slotInfo.getStart().toString(),
+                slotInfo.getEnd().toString()
+        );
+    }
+
+    //Admin xem lịch sử đặt lịch của một member bất kỳ
+//    public List<AppointmentAdminResponse> getAppointmentsOfMember(Long memberId) {
+//
+//
+//        User member = authenticationRepository.findById(memberId)
+//                .orElseThrow(() -> new BadRequestException("Member not found"));
+//
+//        List<Appointment> appointments = appointmentRepository.findByMember(member);
+//
+//        return appointments.stream()
+//                .map(this::toAdminResponse)
+//                .collect(Collectors.toList());
+//    }
+
 }

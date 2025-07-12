@@ -13,4 +13,6 @@ public interface UserSlotRepository extends JpaRepository<UserSlot, Long> {
     List<UserSlot> findUserSlotsByConsultantAndDate (User consultant, LocalDate date);
 
     UserSlot findUserSlotBySlotIdAndConsultantAndDate(long slotId, User consultant, LocalDate date);
+
+    List<UserSlot> findUserSlotsByConsultant(User consultant);
 }
