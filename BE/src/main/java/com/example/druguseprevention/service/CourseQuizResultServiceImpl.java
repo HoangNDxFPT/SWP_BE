@@ -132,5 +132,19 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
                 return dto;
             }).collect(Collectors.toList());
         }
-
+    @Override
+    public List<CourseQuizResultDetailDto> getResultDetailsByResultId(Long resultId) {
+        List<CourseQuizResultDetail> details = courseQuizResultDetailRepository.findAllByQuizResult_Id(resultId);
+        return details.stream().map(detail -> {
+            CourseQuizResultDetailDto dto = new CourseQuizResultDetailDto();
+            dto.setQuestion(detail.getQuestion());
+            dto.setOptions(detail.getOptions());
+            dto.setCorrectAnswer(detail.getCorrectAnswer());
+            dto.setStudentAnswer(detail.getStudentAnswer());
+            dto.setCorrect(detail.isCorrect());
+            return dto;
+        }).collect(Collectors.toList());
     }
+
+
+}

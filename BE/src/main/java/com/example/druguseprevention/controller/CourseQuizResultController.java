@@ -60,13 +60,22 @@ public class CourseQuizResultController {
         return ResponseEntity.ok("Deleted");
     }
     @GetMapping("/my-details")
-    public ResponseEntity<List<CourseQuizResultDetailDto>> getMyQuizResultDetails(Principal principal) {
+    public ResponseEntity<List<CourseQuizResultDetailDto>> getMyQuizResultDetails(
+            @RequestParam("resultId") Long resultId,
+            Principal principal) {
+
         String username = principal.getName();
         User user = userRepository.findByUserName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return ResponseEntity.ok(service.getMyResultDetails(user.getId()));
+        // Kiểm tra quyền sở hữu kết quả
+        if (!service.isOwner(resultId, user.getId())) {
+            return ResponseEntity.status(403).build(); // Forbidden
+        }
+
+        return ResponseEntity.ok(service.getResultDetailsByResultId(resultId));
     }
+
     //
 //    @GetMapping("/my-results")
 //    public ResponseEntity<List<CourseQuizResult>> getMyResults(Principal principal) {

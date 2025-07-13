@@ -18,7 +18,7 @@ public interface CourseQuizResultService {
     List<CourseQuizResult> findByUserId(Long userId);
     List<CourseQuizResultDetailDto> getMyResultDetails(Long userId);
     void submitQuiz(QuizSubmitRequest request, User user);
-
+    List<CourseQuizResultDetailDto> getResultDetailsByResultId(Long resultId);
 
     List<CourseQuizResultDto> getResultDtosByUserId(Long id);
 }
