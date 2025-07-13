@@ -37,6 +37,7 @@ public class SurveyTemplateService {
                     template.setType(updatedTemplate.getType());
                     template.setDescription(updatedTemplate.getDescription());
                     template.setGoogleFormUrl(updatedTemplate.getGoogleFormUrl());
+                    template.setGoogleFormUrlEdit(updatedTemplate.getGoogleFormUrlEdit());
                     template.setGoogleSheetUrl(updatedTemplate.getGoogleSheetUrl());
                     template.setProgram(updatedTemplate.getProgram());
                     return surveyTemplateRepository.save(template);
