@@ -28,6 +28,8 @@ public class SurveyTemplate {
     private String description;
 
     @Column(columnDefinition = "TEXT")
+    private String googleFormUrlEdit;
+    @Column(columnDefinition = "TEXT")
     private String googleFormUrl;
 
     @Column(columnDefinition = "TEXT")
