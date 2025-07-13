@@ -44,6 +44,7 @@ public class CourseServiceImpl implements CourseService {
             existing.setEndDate(course.getEndDate());
             existing.setTargetAgeGroup(course.getTargetAgeGroup());
             existing.setUrl(course.getUrl());
+            existing.setDurationInMinutes(course.getDurationInMinutes());
             return courseRepository.save(existing);
         }).orElse(null);
     }
