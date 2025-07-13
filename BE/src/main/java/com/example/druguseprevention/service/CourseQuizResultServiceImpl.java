@@ -121,17 +121,27 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             courseQuizResultDetailRepository.save(detail);
         }
     }
-        public List<CourseQuizResultDto> getResultDtosByUserId(Long userId) {
-            return courseQuizResultRepository.findByUserId(userId).stream().map(result -> {
-                CourseQuizResultDto dto = new CourseQuizResultDto();
-                dto.setId(result.getId());
-                dto.setScore(result.getScore());
-                dto.setTotalQuestions(result.getTotalQuestions());
-                dto.setCourseName(result.getCourse() != null ? result.getCourse().getName() : null);
-                dto.setSubmittedAt(result.getSubmittedAt() != null ? result.getSubmittedAt().toString() : null);
-                return dto;
-            }).collect(Collectors.toList());
-        }
+    @Override
+    public List<CourseQuizResultDto> getResultDtosByUserId(Long userId) {
+        return courseQuizResultRepository.findByUserId(userId).stream().map(result -> {
+            CourseQuizResultDto dto = new CourseQuizResultDto();
+            dto.setId(result.getId());
+            dto.setScore(result.getScore());
+            dto.setTotalQuestions(result.getTotalQuestions());
+
+            if (result.getCourse() != null) {
+                dto.setCourseId(result.getCourse().getId());
+                dto.setCourseName(result.getCourse().getName());
+            } else {
+                dto.setCourseId(null);
+                dto.setCourseName(null);
+            }
+
+            dto.setSubmittedAt(result.getSubmittedAt() != null ? result.getSubmittedAt().toString() : null);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
     @Override
     public List<CourseQuizResultDetailDto> getResultDetailsByResultId(Long resultId) {
         List<CourseQuizResultDetail> details = courseQuizResultDetailRepository.findAllByQuizResult_Id(resultId);
