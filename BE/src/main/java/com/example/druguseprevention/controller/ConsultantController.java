@@ -41,7 +41,6 @@ public class ConsultantController {
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
     @PutMapping("/profile")
-    @PreAuthorize("hasAnyRole('ADMIN', 'CONSULTANT')")
     public ResponseEntity<Void> updateConsultantProfile(@RequestBody ConsultantProfileDto profileDto) {
         consultantService.updateProfile(getCurrentUserId(), profileDto);
         return ResponseEntity.ok().build();
@@ -71,6 +70,17 @@ public class ConsultantController {
     public ResponseEntity<List<ConsultantPublicProfileDto>> getAllConsultants() {
         return ResponseEntity.ok(consultantService.getAllConsultants());
     }
+    @SecurityRequirement(name = "api")
+    @SecurityRequirement(name = "bearer-key")
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/admin/profile/{consultantId}")
+    public ResponseEntity<Void> updateConsultantProfileByAdmin(
+            @PathVariable Long consultantId,
+            @RequestBody ConsultantProfileDto profileDto) {
+        consultantService.updateProfile(consultantId, profileDto);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/public/{consultantId}")
     public ResponseEntity<ConsultantPublicProfileDto> getPublicConsultantById(
             @PathVariable Long consultantId) {
