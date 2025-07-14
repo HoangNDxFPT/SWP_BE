@@ -32,7 +32,7 @@ public class CourseQuizResultController {
     private final CourseQuizResultDetailRepository courseQuizResultDetailRepository;
     private final CourseQuizResultService courseQuizResultService;
 
-    @PostMapping("/api/quiz-result-submit/")
+    @PostMapping("/submit/")
     public ResponseEntity<CourseQuizResultFullResponse> submitQuiz(
             @RequestBody QuizSubmitRequest request,
             @AuthenticationPrincipal User user) {
