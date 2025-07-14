@@ -1,19 +1,14 @@
 package com.example.druguseprevention.service;
-import com.example.druguseprevention.entity.Enrollment;
-import com.example.druguseprevention.entity.Course;
 
 import com.example.druguseprevention.dto.*;
-import com.example.druguseprevention.entity.CourseQuizResult;
-import com.example.druguseprevention.entity.CourseQuizResultDetail;
-import com.example.druguseprevention.entity.Enrollment;
-import com.example.druguseprevention.entity.User;
-import com.example.druguseprevention.repository.CourseQuizResultDetailRepository;
-import com.example.druguseprevention.repository.CourseQuizResultRepository;
-import com.example.druguseprevention.repository.EnrollmentRepository;
-import com.example.druguseprevention.repository.CourseRepository;
+import com.example.druguseprevention.entity.*;
+import com.example.druguseprevention.repository.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +21,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
     private final CourseQuizResultRepository courseQuizResultRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public List<CourseQuizResult> findAll() {
@@ -67,19 +63,26 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
 
     @Override
     public CourseQuizResultFullResponse submitQuizAndReturn(QuizSubmitRequest request, User user) {
-        // 1. Tạo kết quả quiz
         CourseQuizResult result = new CourseQuizResult();
         result.setUser(user);
-        result.setCourse(request.getCourseId() != null ? courseRepository.findById(request.getCourseId()).orElseThrow() : null);
+        result.setCourse(
+                request.getCourseId() != null
+                        ? courseRepository.findById(request.getCourseId()).orElseThrow()
+                        : null
+        );
         result.setScore((int) request.getScore());
         result.setTotalQuestions(request.getAnswers().size());
         CourseQuizResult savedResult = courseQuizResultRepository.save(result);
 
-        // 2. Lưu từng câu trả lời
         for (QuizAnswerDto dto : request.getAnswers()) {
             CourseQuizResultDetail detail = new CourseQuizResultDetail();
             detail.setQuestion(dto.getQuestion());
-            detail.setOptions(dto.getOptions().toString());
+            try {
+                detail.setOptions(objectMapper.writeValueAsString(dto.getOptions()));
+            } catch (Exception e) {
+                detail.setOptions("[]");
+                e.printStackTrace();
+            }
             detail.setCorrectAnswer(dto.getCorrectAnswer());
             detail.setStudentAnswer(dto.getStudentAnswer());
             detail.setCorrect(dto.getCorrectAnswer().equals(dto.getStudentAnswer()));
@@ -87,7 +90,6 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             courseQuizResultDetailRepository.save(detail);
         }
 
-        // 3. Cập nhật trạng thái khóa học nếu >= 80%
         Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByMemberAndCourse(user, savedResult.getCourse());
         if (savedResult.getScore() >= 0.8 * savedResult.getTotalQuestions()) {
             enrollmentOpt.ifPresent(enrollment -> {
@@ -96,7 +98,6 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             });
         }
 
-        // 4. Tạo response
         CourseQuizResultFullResponse response = new CourseQuizResultFullResponse();
         response.setId(savedResult.getId());
         response.setScore(savedResult.getScore());
@@ -104,16 +105,14 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         response.setSubmittedAt(savedResult.getSubmittedAt() != null ? savedResult.getSubmittedAt().toString() : null);
         response.setCourse(savedResult.getCourse() != null ? CourseDto.fromEntity(savedResult.getCourse()) : null);
         response.setDetails(getResultDetailsByResultId(savedResult.getId()));
-
-        // 5. Gán trạng thái khóa học
-        String courseStatus = enrollmentOpt.map(e -> e.getStatus().name()).orElse(null);
-        response.setCourseStatus(courseStatus);
+        response.setCourseStatus(enrollmentOpt.map(e -> e.getStatus().name()).orElse(null));
 
         return response;
     }
 
     @Override
     public List<CourseQuizResultDto> getResultDtosByUserId(Long userId) {
+        // Bạn có thể thay bằng courseQuizResultRepository.findWithCourseByUserId(userId) nếu đã thêm @Query JOIN FETCH
         return courseQuizResultRepository.findByUserId(userId).stream().map(result -> {
             CourseQuizResultDto dto = new CourseQuizResultDto();
             dto.setId(result.getId());
@@ -122,6 +121,9 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             if (result.getCourse() != null) {
                 dto.setCourseId(result.getCourse().getId());
                 dto.setCourseName(result.getCourse().getName());
+            } else {
+                dto.setCourseId(null);
+                dto.setCourseName("Không xác định");
             }
             dto.setSubmittedAt(result.getSubmittedAt() != null ? result.getSubmittedAt().toString() : null);
             return dto;
@@ -131,18 +133,34 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
     @Override
     public List<CourseQuizResultDetailDto> getResultDetailsByResultId(Long resultId) {
         return courseQuizResultDetailRepository.findAllByQuizResult_Id(resultId)
-                .stream().map(detail -> {
+                .stream()
+                .map(detail -> {
                     CourseQuizResultDetailDto dto = new CourseQuizResultDetailDto();
                     dto.setQuestion(detail.getQuestion());
-                    dto.setOptions(detail.getOptions());
+
+                    String optionsRaw = detail.getOptions();
+                    try {
+                        if (optionsRaw != null && optionsRaw.trim().startsWith("[") && optionsRaw.trim().endsWith("]")) {
+                            dto.setOptions(objectMapper.readValue(optionsRaw, new TypeReference<List<String>>() {}));
+                        } else if (optionsRaw != null) {
+                            dto.setOptions(Collections.singletonList(optionsRaw));
+                        } else {
+                            dto.setOptions(Collections.emptyList());
+                        }
+                    } catch (Exception e) {
+                        dto.setOptions(Collections.emptyList());
+                        e.printStackTrace();
+                    }
+
                     dto.setCorrectAnswer(detail.getCorrectAnswer());
                     dto.setStudentAnswer(detail.getStudentAnswer());
                     dto.setCorrect(detail.isCorrect());
+
                     return dto;
-                }).collect(Collectors.toList());
+                })
+                .collect(Collectors.toList());
     }
 
-    // Không cần override các method không dùng
     @Override
     public CourseQuizResult create(CourseQuizResult result) {
         throw new UnsupportedOperationException("Not implemented");
@@ -150,11 +168,13 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
 
     @Override
     public List<CourseQuizResultDetailDto> getMyResultDetails(Long userId) {
-        throw new UnsupportedOperationException("Not implemented");
+        return courseQuizResultRepository.findTopByUser_IdOrderBySubmittedAtDesc(userId)
+                .map(result -> getResultDetailsByResultId(result.getId()))
+                .orElse(Collections.emptyList());
     }
 
     @Override
     public void submitQuiz(QuizSubmitRequest request, User user) {
-        throw new UnsupportedOperationException("Not implemented");
+        submitQuizAndReturn(request, user);
     }
 }
