@@ -79,7 +79,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         for (QuizAnswerDto dto : request.getAnswers()) {
             CourseQuizResultDetail detail = new CourseQuizResultDetail();
             detail.setQuestion(dto.getQuestion());
-            detail.setOptions(dto.getOptions().toString());
+            detail.setOptions(dto.getOptions());
             detail.setCorrectAnswer(dto.getCorrectAnswer());
             detail.setStudentAnswer(dto.getStudentAnswer());
             detail.setCorrect(dto.getCorrectAnswer().equals(dto.getStudentAnswer()));
