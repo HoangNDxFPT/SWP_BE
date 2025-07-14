@@ -1,22 +1,25 @@
 
 package com.example.druguseprevention.controller;
 
-import com.example.druguseprevention.dto.CourseQuizResultDetailDto;
-import com.example.druguseprevention.dto.CourseQuizResultDto;
-import com.example.druguseprevention.dto.QuizSubmitRequest;
+import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.CourseQuizResult;
 import com.example.druguseprevention.entity.User;
+import com.example.druguseprevention.repository.CourseQuizResultDetailRepository;
+import com.example.druguseprevention.repository.CourseQuizResultRepository;
 import com.example.druguseprevention.repository.UserRepository;
 import com.example.druguseprevention.service.CourseQuizResultService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 
 import java.security.Principal;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @SecurityRequirement(name = "api")
 @SecurityRequirement(name = "bearer-key")
 @RestController
@@ -25,12 +28,20 @@ import java.util.List;
 public class CourseQuizResultController {
     private final UserRepository userRepository;
     private final CourseQuizResultService service;
+    private final CourseQuizResultRepository repository;
+    private final CourseQuizResultDetailRepository courseQuizResultDetailRepository;
+    private final CourseQuizResultService courseQuizResultService;
 
-    //  User và Admin đều được phép tạo
-    @PostMapping
-    public ResponseEntity<CourseQuizResult> create(@RequestBody CourseQuizResult result) {
-        return ResponseEntity.ok(service.create(result));
+    @PostMapping("/api/quiz-result-submit/")
+    public ResponseEntity<CourseQuizResultFullResponse> submitQuiz(
+            @RequestBody QuizSubmitRequest request,
+            @AuthenticationPrincipal User user) {
+
+        CourseQuizResultFullResponse result = courseQuizResultService.submitQuizAndReturn(request, user);
+        return ResponseEntity.ok(result);
     }
+
+
 
     // Chỉ Admin xem toàn bộ kết quả
     @PreAuthorize("hasRole('ADMIN')")
@@ -97,16 +108,16 @@ public class CourseQuizResultController {
         return ResponseEntity.ok(results);
     }
 
-    @PostMapping("/submit")
-    public ResponseEntity<?> submitQuiz(@RequestBody QuizSubmitRequest request, Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByUserName(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        service.submitQuiz(request, user);
-
-        return ResponseEntity.ok("Đã lưu kết quả bài làm.");
-    }
+//    @PostMapping("/submit")
+//    public ResponseEntity<?> submitQuiz(@RequestBody QuizSubmitRequest request, Principal principal) {
+//        String username = principal.getName();
+//        User user = userRepository.findByUserName(username)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        service.submitQuiz(request, user);
+//
+//        return ResponseEntity.ok("Đã lưu kết quả bài làm.");
+//    }
 
 
 
