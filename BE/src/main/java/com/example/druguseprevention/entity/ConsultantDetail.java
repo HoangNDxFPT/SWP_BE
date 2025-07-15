@@ -31,5 +31,8 @@ public class ConsultantDetail {
 
     @Column(columnDefinition = "TEXT")
     private String googleMeetLink;
+    @Column(name = "avatar_url", columnDefinition = "TEXT")
+    private String avatarUrl;
+
 
 }

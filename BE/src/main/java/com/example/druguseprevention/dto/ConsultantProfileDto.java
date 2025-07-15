@@ -10,6 +10,7 @@ public class ConsultantProfileDto {
     private String address;
     private String degree;
     private String information;
+    private String avatarUrl;
     private String certifiedDegree;
     private String certifiedDegreeImage;
     private String googleMeetLink;

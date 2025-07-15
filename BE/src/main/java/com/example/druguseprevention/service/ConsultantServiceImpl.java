@@ -42,6 +42,7 @@ public class ConsultantServiceImpl implements ConsultantService {
         detail.setCertifiedDegree(dto.getCertifiedDegree());
         detail.setCertifiedDegreeImage(dto.getCertifiedDegreeImage());
         detail.setGoogleMeetLink(dto.getGoogleMeetLink());
+        detail.setAvatarUrl(dto.getAvatarUrl()); // ✅ Lưu avatar URL từ FE
 
         consultantDetailRepository.save(detail);
     }
@@ -50,10 +51,6 @@ public class ConsultantServiceImpl implements ConsultantService {
     public ConsultantProfileDto getProfile(Long consultantId) {
         User user = (User) userRepository.findByIdAndDeletedFalse(consultantId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy tư vấn viên"));
-
-//        if (user.getRole() != Role.CONSULTANT) {
-//            throw new RuntimeException("Người dùng không phải là tư vấn viên");
-//        }
 
         ConsultantDetail detail = consultantDetailRepository.findByConsultantId(consultantId);
 
@@ -69,6 +66,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setCertifiedDegree(detail.getCertifiedDegree());
             dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
             dto.setGoogleMeetLink(detail.getGoogleMeetLink());
+            dto.setAvatarUrl(detail.getAvatarUrl()); // Trả avatar URL cho FE nếu cần
         }
 
         return dto;
@@ -94,7 +92,7 @@ public class ConsultantServiceImpl implements ConsultantService {
             dto.setDegree(detail.getDegree());
             dto.setInformation(detail.getInformation());
             dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
-
+            dto.setAvatarUrl(detail.getAvatarUrl()); // Trả avatar URL
         }
 
         return dto;
@@ -139,15 +137,14 @@ public class ConsultantServiceImpl implements ConsultantService {
 
     @Override
     public List<ConsultantPublicProfileDto> getAllConsultants() {
-        return getAllConsultantProfiles(); // tái sử dụng logic
+        return getAllConsultantProfiles();
     }
 
     @Override
     public List<ConsultantPublicProfileDto> getAllPublicConsultants() {
-        return getAllConsultantProfiles(); // dùng chung với /public
+        return getAllConsultantProfiles();
     }
 
-    // ✅ Reusable method
     private List<ConsultantPublicProfileDto> getAllConsultantProfiles() {
         List<User> consultants = userRepository.findByRoleAndDeletedFalse(Role.CONSULTANT);
 
@@ -164,7 +161,7 @@ public class ConsultantServiceImpl implements ConsultantService {
                         dto.setDegree(detail.getDegree());
                         dto.setInformation(detail.getInformation());
                         dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
-
+                        dto.setAvatarUrl(detail.getAvatarUrl()); //  Trả avatar URL
                     }
 
                     return dto;

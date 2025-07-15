@@ -9,6 +9,7 @@ public class ConsultantPublicProfileDto {
     private String fullName;
     private String degree;
     private String information;
+    private String avatarUrl;
     private String certifiedDegreeImage;
     private String address ;
 }
