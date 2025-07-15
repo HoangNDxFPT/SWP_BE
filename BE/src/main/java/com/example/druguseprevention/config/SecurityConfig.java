@@ -54,7 +54,12 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",          // dev local
+                "https://swp-fe-three.vercel.app",
+                "https://swp-be-c3dj.onrender.com"// production
+                // nếu bạn có domain
+        ));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         source.registerCorsConfiguration("/**", config);
