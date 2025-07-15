@@ -177,4 +177,20 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
     public void submitQuiz(QuizSubmitRequest request, User user) {
         submitQuizAndReturn(request, user);
     }
+    @Override
+    public List<CourseQuizResultDto> getAllResultDtos() {
+        return courseQuizResultRepository.findAll().stream().map(result -> {
+            CourseQuizResultDto dto = new CourseQuizResultDto();
+            dto.setId(result.getId());
+            dto.setScore(result.getScore());
+            dto.setTotalQuestions(result.getTotalQuestions());
+            if (result.getCourse() != null) {
+                dto.setCourseId(result.getCourse().getId());
+                dto.setCourseName(result.getCourse().getName());
+            }
+            dto.setSubmittedAt(result.getSubmittedAt() != null ? result.getSubmittedAt().toString() : null);
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }
