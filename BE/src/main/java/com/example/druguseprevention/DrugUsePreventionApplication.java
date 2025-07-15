@@ -1,5 +1,6 @@
 package com.example.druguseprevention;
 
+import com.example.druguseprevention.config.EnvLoader;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -14,6 +15,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DrugUsePreventionApplication {
 
 	public static void main(String[] args) {
+		EnvLoader.load();
 		SpringApplication.run(DrugUsePreventionApplication.class, args);
 	}
 
