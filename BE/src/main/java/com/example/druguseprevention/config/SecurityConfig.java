@@ -36,18 +36,20 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @Autowired
     Filter filter;
 
     @Autowired
     AuthenticationService authenticationService;
+    
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -76,11 +78,18 @@ public class SecurityConfig {
                                         "/api/reset-password",
                                         "/api/forgot-password",
                                         "/api/consultant/public/**", // Bao gồm cả /api/consultant/public/{id} và /api/consultant/public/all
-                                        "/api/public/all" // Nếu bạn có endpoint này ở gốc /api/public/all
+                                        "/api/public/all",
+                                        "/oauth2/**",                          // Cho phép Spring xử lý OAuth2
+                                        "/login/oauth2/**",
+                                        "/auth/oauth2/success"
                                 ).permitAll()
                                 // Add Swagger 3 endpoints to permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl(frontendUrl + "/login/success", true) // redirect FE sau login thành công
+                        .failureHandler(new SimpleUrlAuthenticationFailureHandler(frontendUrl + "/login/failure"))
                 )
                 .userDetailsService(authenticationService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
