@@ -18,6 +18,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -35,21 +36,24 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @Autowired
     Filter filter;
 
+    @Autowired
+    AuthenticationService authenticationService;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-    @Value("${app.frontend.url}")
-    private String frontendUrl;
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
@@ -78,12 +82,20 @@ public class SecurityConfig {
                                         "/api/reset-password",
                                         "/api/forgot-password",
                                         "/api/consultant/public/**", // Bao gồm cả /api/consultant/public/{id} và /api/consultant/public/all
-                                        "/api/public/all" // Nếu bạn có endpoint này ở gốc /api/public/all
+                                        "/api/public/all",
+                                        "/oauth2/**",                          // Cho phép Spring xử lý OAuth2
+                                        "/login/oauth2/**",
+                                        "/auth/oauth2/success"
                                 ).permitAll()
                                 // Add Swagger 3 endpoints to permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 .anyRequest().authenticated()
                 )
+                .oauth2Login(oauth2 -> oauth2
+                        .defaultSuccessUrl("https://swp-fe-three.vercel.app/login/success", true) // redirect FE sau login thành công
+                        .failureHandler(new SimpleUrlAuthenticationFailureHandler("https://swp-fe-three.vercel.app/login/failure"))
+                )
+                .userDetailsService(authenticationService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
