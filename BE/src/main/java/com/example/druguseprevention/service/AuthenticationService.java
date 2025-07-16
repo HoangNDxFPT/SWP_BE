@@ -29,6 +29,7 @@ public class AuthenticationService implements UserDetailsService {
     PasswordEncoder passwordEncoder;
 
     @Autowired
+    @Lazy
     AuthenticationManager authenticationManager;
 
     @Autowired
