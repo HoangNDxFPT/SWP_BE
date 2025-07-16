@@ -1,5 +1,6 @@
 package com.example.druguseprevention.service;
 
+import com.example.druguseprevention.dto.ConsultantFullProfileDto;
 import com.example.druguseprevention.dto.ConsultantProfileDto;
 import com.example.druguseprevention.dto.ConsultantPublicProfileDto;
 import com.example.druguseprevention.dto.UserProfileDto;
@@ -168,4 +169,31 @@ public class ConsultantServiceImpl implements ConsultantService {
                 })
                 .collect(Collectors.toList());
     }
+    @Override
+    public List<ConsultantFullProfileDto> getAllConsultantFullProfiles() {
+        return userRepository.findByRole(Role.CONSULTANT).stream()
+                .map((User user) -> {
+                    ConsultantDetail detail = consultantDetailRepository.findByConsultantId(user.getId());
+
+                    ConsultantFullProfileDto dto = new ConsultantFullProfileDto();
+                    dto.setConsultantId(user.getId());
+                    dto.setFullName(user.getFullName());
+                    dto.setPhoneNumber(user.getPhoneNumber());
+                    dto.setAddress(user.getAddress());
+
+                    if (detail != null) {
+                        dto.setAvatarUrl(detail.getAvatarUrl());
+                        dto.setDegree(detail.getDegree());
+                        dto.setInformation(detail.getInformation());
+                        dto.setCertifiedDegree(detail.getCertifiedDegree());
+                        dto.setCertifiedDegreeImage(detail.getCertifiedDegreeImage());
+                        dto.setGoogleMeetLink(detail.getGoogleMeetLink());
+                    }
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
 }
+
