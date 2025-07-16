@@ -20,7 +20,7 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
 
     @PostMapping("/api/register")
-    public ResponseEntity register(@Valid @RequestBody RegisterRequest registerRequest){
+    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest){
         User newUser = authenticationService.register(registerRequest);
         return ResponseEntity.ok(newUser);
     }
