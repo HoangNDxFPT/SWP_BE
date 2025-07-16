@@ -42,7 +42,11 @@ public class Filter extends OncePerRequestFilter {
             "GET:/swagger-ui/**",
             "GET:/api/consultant/public/**",
             "GET:/api/public/all",
-            "GET:/swagger-ui.html"
+            "GET:/swagger-ui.html",
+            // Thêm OAuth2 endpoints
+            "GET:/oauth2/**",
+            "GET:/login/oauth2/**",
+            "GET:/auth/oauth2/success"
     );
 
     public boolean isPublicAPI(String uri, String method) {
