@@ -8,18 +8,14 @@ import com.example.druguseprevention.repository.AuthenticationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -102,7 +98,7 @@ public class AuthenticationService implements UserDetailsService {
         Context context = new Context();
         context.setVariable("name", user.getFullName());
         context.setVariable("button", "Reset Password");
-        context.setVariable("link", "http://localhost:5173/reset-password?token=" + token); // đường link frontend
+        context.setVariable("link", "https://swp-fe-three.vercel.app/reset-password?token=" + token); // đường link frontend
 
         String html = templateEngine.process("resetpasswordtemplate", context);
         emailService.sendHtmlEmail(detail, html);
@@ -141,9 +137,6 @@ public class AuthenticationService implements UserDetailsService {
 
         return authenticationRepository.save(user);
     }
-
-
-
     
 
 }

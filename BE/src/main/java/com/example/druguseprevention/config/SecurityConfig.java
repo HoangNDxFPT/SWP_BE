@@ -44,11 +44,7 @@ public class SecurityConfig {
 
     @Autowired
     AuthenticationService authenticationService;
-
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
+    
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -92,8 +88,8 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl("https://swp-fe-three.vercel.app/login/success", true) // redirect FE sau login thành công
-                        .failureHandler(new SimpleUrlAuthenticationFailureHandler("https://swp-fe-three.vercel.app/login/failure"))
+                        .defaultSuccessUrl(frontendUrl + "/login/success", true) // redirect FE sau login thành công
+                        .failureHandler(new SimpleUrlAuthenticationFailureHandler(frontendUrl + "/login/failure"))
                 )
                 .userDetailsService(authenticationService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
