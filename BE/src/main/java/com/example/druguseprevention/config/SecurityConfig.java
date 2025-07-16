@@ -1,6 +1,7 @@
 package com.example.druguseprevention.config;
 
 import com.example.druguseprevention.service.AuthenticationService;
+import com.example.druguseprevention.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ import java.util.List;
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
+
+    @Autowired
+    CustomOAuth2UserService customOAuth2UserService;
 
     @Value("${app.frontend.url}")
     private String frontendUrl;
@@ -79,6 +83,7 @@ public class SecurityConfig {
                                         "/api/forgot-password",
                                         "/api/consultant/public/**", // Bao gồm cả /api/consultant/public/{id} và /api/consultant/public/all
                                         "/api/public/all",
+                                        "/oauth2/code/google",
                                         "/oauth2/**",                          // Cho phép Spring xử lý OAuth2
                                         "/login/oauth2/**",
                                         "/auth/oauth2/success"
@@ -88,7 +93,10 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl(frontendUrl + "/login/success", true) // redirect FE sau login thành công
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService) // <-- Quan trọng
+                        )
+                        .defaultSuccessUrl(frontendUrl + "/login/success", true)
                         .failureHandler(new SimpleUrlAuthenticationFailureHandler(frontendUrl + "/login/failure"))
                 )
                 .userDetailsService(authenticationService)

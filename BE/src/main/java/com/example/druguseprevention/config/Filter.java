@@ -44,7 +44,9 @@ public class Filter extends OncePerRequestFilter {
             "GET:/api/public/all",
             "GET:/swagger-ui.html",
             // Thêm OAuth2 endpoints
+            "GET:/oauth2/code/google",
             "GET:/oauth2/**",
+            "POST:/oauth2/**",
             "GET:/login/oauth2/**",
             "GET:/auth/oauth2/success"
     );
