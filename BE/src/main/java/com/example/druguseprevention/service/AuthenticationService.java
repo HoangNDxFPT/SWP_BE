@@ -7,6 +7,7 @@ import com.example.druguseprevention.exception.exceptions.AuthenticationExceptio
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
