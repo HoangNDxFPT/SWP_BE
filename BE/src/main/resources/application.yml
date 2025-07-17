@@ -34,6 +34,13 @@ spring:
 
         redirect-uri-template: "{baseUrl}/oauth2/code/{registrationId}"
 
+  server:
+    servlet:
+      session:
+        cookie:
+          same-site: None
+          secure: true
+
   mail:
     host: smtp.gmail.com
     port: 587
