@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.*;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.exception.exceptions.AuthenticationException;
+import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,13 @@ public class AuthenticationService implements UserDetailsService {
     TemplateEngine templateEngine;
 
     public User register (RegisterRequest registerRequest){
+        if (authenticationRepository.findUserByUserName(registerRequest.getUserName()) != null) {
+            throw new BadRequestException("Username already exists!");
+        }
+
+        if (authenticationRepository.findUserByEmail(registerRequest.getEmail()) != null) {
+            throw new BadRequestException("Email already exists!");
+        }
         User user = modelMapper.map(registerRequest, User.class);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         // Gán role mặc định là "Member"
