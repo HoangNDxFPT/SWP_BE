@@ -9,6 +9,8 @@ import com.example.druguseprevention.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +36,12 @@ public class AppointmentService {
 
     @Autowired
     ConsultantDetailRepository consultantDetailRepository;
+
+    @Autowired
+    TemplateEngine templateEngine;
+
+    @Autowired
+    EmailService emailService;
 
     @Transactional
     public AppointmentResponse create(AppointmentRequest appointmentRequest) {
@@ -77,6 +85,24 @@ public class AppointmentService {
 
         // 7. Trả về response có thông tin meet link
         Slot slotInfo = slot.getSlot();
+
+        // 8. Gửi mail khi đặt lịch thành công
+        EmailDetail emailDetail = new EmailDetail();
+        emailDetail.setRecipient(currentMember.getEmail());
+        emailDetail.setSubject("Xác nhận lịch hẹn với chuyên viên tư vấn");
+
+        Context context = new Context();
+        context.setVariable("name", currentMember.getFullName());
+        context.setVariable("consultant", consultant.getFullName());
+        context.setVariable("date", slot.getDate());
+        context.setVariable("start", slotInfo.getStart().toString());
+        context.setVariable("end", slotInfo.getEnd().toString());
+        context.setVariable("link", detail.getGoogleMeetLink());
+        String html = templateEngine.process("appointment", context);
+
+        emailService.sendHtmlEmail(emailDetail, html);
+
+
         return new AppointmentResponse(
                 appointment.getId(),
                 appointment.getCreateAt(),
@@ -291,18 +317,5 @@ public class AppointmentService {
         );
     }
 
-    //Admin xem lịch sử đặt lịch của một member bất kỳ
-//    public List<AppointmentAdminResponse> getAppointmentsOfMember(Long memberId) {
-//
-//
-//        User member = authenticationRepository.findById(memberId)
-//                .orElseThrow(() -> new BadRequestException("Member not found"));
-//
-//        List<Appointment> appointments = appointmentRepository.findByMember(member);
-//
-//        return appointments.stream()
-//                .map(this::toAdminResponse)
-//                .collect(Collectors.toList());
-//    }
 
 }

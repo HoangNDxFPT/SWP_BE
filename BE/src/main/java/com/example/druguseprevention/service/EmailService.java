@@ -26,7 +26,7 @@ public class EmailService {
             Context context = new Context();
             context.setVariable("name", user.getFullName());
             context.setVariable("button", "Login");
-            context.setVariable("link", "http://localhost:5173/login");
+            context.setVariable("link", "https://swp-fe-sandy.vercel.app/login");
             String html = templateEngine.process("emailtemplate", context);
 
             // Creating a simple mail message
