@@ -156,8 +156,27 @@ public class AppointmentService {
         ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                 .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
-        // 7. Trả về response
+        // 7. Gửi mail xác nhận đến member
+        EmailDetail emailDetail = new EmailDetail();
+        emailDetail.setRecipient(member.getEmail());
+        emailDetail.setSubject("Xác nhận lịch hẹn với chuyên viên tư vấn");
+
         Slot slotInfo = slot.getSlot();
+
+        Context context = new Context();
+        context.setVariable("name", member.getFullName());
+        context.setVariable("consultant", consultant.getFullName());
+        context.setVariable("date", slot.getDate());
+        context.setVariable("start", slotInfo.getStart().toString());
+        context.setVariable("end", slotInfo.getEnd().toString());
+        context.setVariable("link", detail.getGoogleMeetLink());
+        String html = templateEngine.process("appointmentconsultant", context);
+
+        emailService.sendHtmlEmail(emailDetail, html);
+
+
+        // 8. Trả về response
+
         return new AppointmentResponseForConsultant(
                 appointment.getId(),
                 appointment.getCreateAt(),
