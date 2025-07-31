@@ -6,6 +6,7 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -30,6 +31,15 @@ spring:
             token-uri: https://oauth2.googleapis.com/token
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
             user-name-attribute: sub
+
+        redirect-uri-template: "{baseUrl}/oauth2/code/{registrationId}"
+
+  server:
+    servlet:
+      session:
+        cookie:
+          same-site: None
+          secure: true
 
   mail:
     host: smtp.gmail.com
@@ -70,5 +80,3 @@ logging:
 app:
   frontend:
     url: ${FRONTEND_URL}
-
-

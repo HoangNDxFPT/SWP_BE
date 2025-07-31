@@ -24,7 +24,7 @@ public class SlotController
     @Autowired
     SlotService slotService;
 
-    @PreAuthorize("hasRole ('ADMIN'')")
+    @PreAuthorize("hasRole ('ADMIN')")
     // admin chạy 1 lần duy nhất
     @PostMapping
     public void generateSlot()

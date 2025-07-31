@@ -1,6 +1,7 @@
 package com.example.druguseprevention.service;
 
 import com.example.druguseprevention.entity.User;
+import com.example.druguseprevention.enums.Gender;
 import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        System.out.println("CustomOAuth2UserService.loadUser() called");
         OAuth2User oAuth2User = new DefaultOAuth2UserService().loadUser(userRequest);
 
         String email = oAuth2User.getAttribute("email");
@@ -40,9 +42,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
             user.setEmail(email);
             user.setFullName(name);
             user.setUserName(email);
-            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString())); // random password
+            user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setGender(Gender.MALE);
             user.setRole(Role.MEMBER);
-            authenticationRepository.save(user);
+            try {
+                authenticationRepository.save(user);
+            } catch (Exception e) {
+                System.out.println(" Failed to save user: " + e.getMessage());
+                e.printStackTrace();
+            }
         }
 
         return new DefaultOAuth2User(

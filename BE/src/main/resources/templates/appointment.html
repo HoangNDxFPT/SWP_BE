@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác nhận lịch hẹn</title>
+</head>
+<body>
+<h2>Xin chào <span th:text="${name}">[Name]</span>,</h2>
+<p>Bạn đã đặt lịch tư vấn thành công với chuyên gia <strong th:text="${consultant}">[Consultant Name]</strong>.</p>
+<p><strong>Thời gian:</strong> <span th:text="${date}">[Date]</span> từ <span th:text="${start}">[Start]</span> đến <span th:text="${end}">[End]</span></p>
+<p><strong>Google Meet:</strong> <a th:href="${link}" th:text="${link}">[Meet Link]</a></p>
+<br>
+<p>Vui lòng tham gia đúng giờ!</p>
+<p>Trân trọng,<br/>Drug Use Prevention System</p>
+</body>
+</html>

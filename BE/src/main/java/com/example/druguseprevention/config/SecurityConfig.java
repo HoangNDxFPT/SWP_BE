@@ -1,10 +1,13 @@
 package com.example.druguseprevention.config;
 
 import com.example.druguseprevention.service.AuthenticationService;
+import com.example.druguseprevention.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -36,6 +39,9 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Autowired
+    CustomOAuth2UserService customOAuth2UserService;
+
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
@@ -56,7 +62,7 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(frontendUrl));
+        config.setAllowedOriginPatterns(List.of(frontendUrl));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         source.registerCorsConfiguration("/**", config);
@@ -79,6 +85,7 @@ public class SecurityConfig {
                                         "/api/forgot-password",
                                         "/api/consultant/public/**", // Bao gồm cả /api/consultant/public/{id} và /api/consultant/public/all
                                         "/api/public/all",
+                                        "/oauth2/code/google",
                                         "/oauth2/**",                          // Cho phép Spring xử lý OAuth2
                                         "/login/oauth2/**",
                                         "/auth/oauth2/success"
@@ -88,11 +95,14 @@ public class SecurityConfig {
                                 .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .defaultSuccessUrl(frontendUrl + "/login/success", true) // redirect FE sau login thành công
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService) // <-- Quan trọng
+                        )
+                        .defaultSuccessUrl(frontendUrl + "/login/success", true)
                         .failureHandler(new SimpleUrlAuthenticationFailureHandler(frontendUrl + "/login/failure"))
                 )
                 .userDetailsService(authenticationService)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
