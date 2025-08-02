@@ -80,7 +80,7 @@ public class AuthenticationService implements UserDetailsService {
         Context context = new Context();
         context.setVariable("name", user.getFullName());
         context.setVariable("button", "Activate Account");
-        context.setVariable("link", verifyEmailUrl + user.getActivationToken()); // đường link frontend
+//        context.setVariable("link", verifyEmailUrl + user.getActivationToken()); // đường link frontend
 
         String html = templateEngine.process("emailtemplate", context);
         emailService.sendHtmlEmail(emailDetail, html);
