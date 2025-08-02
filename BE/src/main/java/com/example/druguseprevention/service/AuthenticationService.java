@@ -9,6 +9,7 @@ import com.example.druguseprevention.repository.AuthenticationRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,6 +39,14 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     @Lazy
     private AuthenticationManager authenticationManager;
+
+    @Value("${app.verifyEmail.url}")
+    private String verifyEmailUrl;
+
+    @Value("${app.resetPassword.url}")
+    private String resetPasswordUrl;
+
+
 
     public User register(RegisterRequest registerRequest) {
         if (authenticationRepository.findUserByUserName(registerRequest.getUserName()) != null) {
@@ -71,7 +80,7 @@ public class AuthenticationService implements UserDetailsService {
         Context context = new Context();
         context.setVariable("name", user.getFullName());
         context.setVariable("button", "Activate Account");
-        context.setVariable("link", "http://localhost:5173/activate?token=" + user.getActivationToken()); // đường link frontend
+        context.setVariable("link", verifyEmailUrl + user.getActivationToken()); // đường link frontend
 
         String html = templateEngine.process("emailtemplate", context);
         emailService.sendHtmlEmail(emailDetail, html);
@@ -162,7 +171,7 @@ public class AuthenticationService implements UserDetailsService {
         Context context = new Context();
         context.setVariable("name", user.getFullName());
         context.setVariable("button", "Reset Password");
-        context.setVariable("link", "http://localhost:5173/reset-password?token=" + token); // đường link frontend
+        context.setVariable("link", resetPasswordUrl + token); // đường link frontend
 
         String html = templateEngine.process("resetpasswordtemplate", context);
         emailService.sendHtmlEmail(detail, html);
