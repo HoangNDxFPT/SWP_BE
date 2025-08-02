@@ -58,13 +58,13 @@ public class AuthenticationController {
         return ResponseEntity.ok("Logout successfully!");
     }
 
-    @GetMapping("/activate")
+    @GetMapping("/api/activate")
     public ResponseEntity<String> activateAccount(@RequestParam String token) {
         authenticationService.activateAccount(token);
         return ResponseEntity.ok("Account activated successfully! You can now login.");
     }
 
-    @PostMapping("/resend-activation")
+    @PostMapping("/api/resend-activation")
     public ResponseEntity<String> resendActivationEmail(@RequestParam String email) {
         authenticationService.resendActivationEmail(email);
         return ResponseEntity.ok("Activation email has been resent. Please check your inbox.");
