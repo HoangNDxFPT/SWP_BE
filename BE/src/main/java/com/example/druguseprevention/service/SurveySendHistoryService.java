@@ -3,6 +3,7 @@ package com.example.druguseprevention.service;
 import com.example.druguseprevention.dto.SurveySendHistoryDTO;
 import com.example.druguseprevention.entity.SurveySendHistory;
 import com.example.druguseprevention.repository.SurveySendHistoryRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,13 +12,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SurveySendHistoryService {
 
-    @Autowired
-    private SurveySendHistoryRepository surveySendHistoryRepository;
+    private final SurveySendHistoryRepository surveySendHistoryRepository;
 
-    @Autowired
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
     public List<SurveySendHistoryDTO> getSurveyHistoryByUser(Long userId) {
         return surveySendHistoryRepository.findByUserId(userId)

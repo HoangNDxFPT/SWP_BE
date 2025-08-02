@@ -6,6 +6,7 @@ import com.example.druguseprevention.dto.ProfileDTO;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,17 +17,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    // Kiểm tra xem user hiện tại có phải là admin hay không
+        // Kiểm tra xem user hiện tại có phải là admin hay không
     public boolean isCurrentUserAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));

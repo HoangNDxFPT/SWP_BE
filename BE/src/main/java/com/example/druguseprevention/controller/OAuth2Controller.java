@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.UserResponse;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import com.example.druguseprevention.service.TokenService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -14,13 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class OAuth2Controller {
 
-    @Autowired
-    TokenService tokenService;
+    private final TokenService tokenService;
 
-    @Autowired
-    AuthenticationRepository authenticationRepository;
+    private final AuthenticationRepository authenticationRepository;
 
     @GetMapping("/oauth2/success")
     public ResponseEntity<UserResponse> getOAuth2Success(Authentication authentication) {

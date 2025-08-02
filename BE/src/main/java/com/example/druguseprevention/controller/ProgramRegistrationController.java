@@ -6,6 +6,7 @@ import com.example.druguseprevention.dto.UserDTO;
 import com.example.druguseprevention.entity.ProgramParticipation;
 import com.example.druguseprevention.service.ProgramRegistrationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/programs")
 @SecurityRequirement(name = "api")
+@RequiredArgsConstructor
 public class ProgramRegistrationController {
 
-    @Autowired
-    private ProgramRegistrationService registrationService;
+    private final ProgramRegistrationService registrationService;
 
     @PostMapping("/{programId}/register")
     public ResponseEntity<?> register(@PathVariable Long programId) {
