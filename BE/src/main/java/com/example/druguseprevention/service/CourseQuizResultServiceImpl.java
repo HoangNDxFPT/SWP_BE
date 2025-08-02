@@ -14,26 +14,30 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Tạo constructor tự động cho các final fields
 public class CourseQuizResultServiceImpl implements CourseQuizResultService {
 
+    // Inject các repository và object mapper
     private final CourseQuizResultDetailRepository courseQuizResultDetailRepository;
     private final CourseQuizResultRepository courseQuizResultRepository;
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    // Lấy tất cả kết quả quiz
     @Override
     public List<CourseQuizResult> findAll() {
         return courseQuizResultRepository.findAll();
     }
 
+    // Tìm kết quả quiz theo ID
     @Override
     public CourseQuizResult findById(Long id) {
         return courseQuizResultRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Result not found"));
     }
 
+    // Cập nhật kết quả quiz
     @Override
     public CourseQuizResult update(Long id, CourseQuizResult updatedResult) {
         CourseQuizResult existing = findById(id);
@@ -44,11 +48,13 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         return courseQuizResultRepository.save(existing);
     }
 
+    // Xoá kết quả theo ID
     @Override
     public void delete(Long id) {
         courseQuizResultRepository.deleteById(id);
     }
 
+    // Kiểm tra xem user có phải chủ nhân của kết quả này không
     @Override
     public boolean isOwner(Long resultId, Long userId) {
         return courseQuizResultRepository.findById(resultId)
@@ -56,13 +62,16 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
                 .orElse(false);
     }
 
+    // Lấy danh sách kết quả của 1 user
     @Override
     public List<CourseQuizResult> findByUserId(Long userId) {
         return courseQuizResultRepository.findByUserId(userId);
     }
 
+    // Nộp bài quiz và trả về kết quả đầy đủ
     @Override
     public CourseQuizResultFullResponse submitQuizAndReturn(QuizSubmitRequest request, User user) {
+        // Tạo bản ghi kết quả
         CourseQuizResult result = new CourseQuizResult();
         result.setUser(user);
         result.setCourse(
@@ -72,8 +81,10 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         );
         result.setScore((int) request.getScore());
         result.setTotalQuestions(request.getAnswers().size());
+
         CourseQuizResult savedResult = courseQuizResultRepository.save(result);
 
+        // Lưu từng câu trả lời chi tiết
         for (QuizAnswerDto dto : request.getAnswers()) {
             CourseQuizResultDetail detail = new CourseQuizResultDetail();
             detail.setQuestion(dto.getQuestion());
@@ -90,6 +101,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             courseQuizResultDetailRepository.save(detail);
         }
 
+        // Nếu điểm >= 80%, cập nhật trạng thái khoá học thành "Completed"
         Optional<Enrollment> enrollmentOpt = enrollmentRepository.findByMemberAndCourse(user, savedResult.getCourse());
         if (savedResult.getScore() >= 0.8 * savedResult.getTotalQuestions()) {
             enrollmentOpt.ifPresent(enrollment -> {
@@ -98,6 +110,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             });
         }
 
+        // Trả về kết quả đầy đủ
         CourseQuizResultFullResponse response = new CourseQuizResultFullResponse();
         response.setId(savedResult.getId());
         response.setScore(savedResult.getScore());
@@ -110,9 +123,9 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         return response;
     }
 
+    // Lấy danh sách kết quả dưới dạng DTO (cho 1 user)
     @Override
     public List<CourseQuizResultDto> getResultDtosByUserId(Long userId) {
-        // Bạn có thể thay bằng courseQuizResultRepository.findWithCourseByUserId(userId) nếu đã thêm @Query JOIN FETCH
         return courseQuizResultRepository.findByUserId(userId).stream().map(result -> {
             CourseQuizResultDto dto = new CourseQuizResultDto();
             dto.setId(result.getId());
@@ -130,6 +143,7 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
         }).collect(Collectors.toList());
     }
 
+    // Lấy danh sách chi tiết kết quả quiz (câu hỏi, đáp án, lựa chọn,...)
     @Override
     public List<CourseQuizResultDetailDto> getResultDetailsByResultId(Long resultId) {
         return courseQuizResultDetailRepository.findAllByQuizResult_Id(resultId)
@@ -161,11 +175,13 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
                 .collect(Collectors.toList());
     }
 
+    // Không hỗ trợ tạo kết quả quiz bằng tay
     @Override
     public CourseQuizResult create(CourseQuizResult result) {
         throw new UnsupportedOperationException("Not implemented");
     }
 
+    // Lấy chi tiết kết quả quiz gần nhất của user
     @Override
     public List<CourseQuizResultDetailDto> getMyResultDetails(Long userId) {
         return courseQuizResultRepository.findTopByUser_IdOrderBySubmittedAtDesc(userId)
@@ -173,10 +189,13 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
                 .orElse(Collections.emptyList());
     }
 
+    // Nộp quiz (dạng không cần trả response)
     @Override
     public void submitQuiz(QuizSubmitRequest request, User user) {
         submitQuizAndReturn(request, user);
     }
+
+    // Lấy tất cả kết quả quiz dưới dạng DTO (cho admin)
     @Override
     public List<CourseQuizResultDto> getAllResultDtos() {
         return courseQuizResultRepository.findAll().stream().map(result -> {
@@ -192,5 +211,4 @@ public class CourseQuizResultServiceImpl implements CourseQuizResultService {
             return dto;
         }).collect(Collectors.toList());
     }
-
 }
