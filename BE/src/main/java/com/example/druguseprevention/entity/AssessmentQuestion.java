@@ -26,7 +26,12 @@ public class AssessmentQuestion {
 
     private Integer questionOrder;
 
-    private  boolean isDeleted = false;
+    private boolean isDeleted = false;
+
+    // Thêm liên kết với Substance cho ASSIST
+    @ManyToOne
+    @JoinColumn(name = "substance_id")
+    private Substance substance;
 
     @OneToMany(mappedBy = "question")
     @JsonIgnore
@@ -34,6 +39,5 @@ public class AssessmentQuestion {
 
     @OneToMany(mappedBy = "question")
     @JsonIgnore
-    private  List<UserAssessmentAnswer> userAssessmentAnswers;
+    private List<UserAssessmentAnswer> userAssessmentAnswers;
 }
-

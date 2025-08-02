@@ -12,4 +12,8 @@ public interface AssessmentQuestionRepository extends JpaRepository<AssessmentQu
     List<AssessmentQuestion> findByIsDeletedFalse();
     Optional<AssessmentQuestion> findByIdAndIsDeletedFalse(Long id);
     List<AssessmentQuestion> findByAssessmentTypeAndIsDeletedFalseOrderByQuestionOrder(AssessmentType type);
+
+    // Thêm các method để tìm kiếm theo substance
+    List<AssessmentQuestion> findByAssessmentTypeAndSubstanceIdAndIsDeletedFalseOrderByQuestionOrder(AssessmentType type, Long substanceId);
+    List<AssessmentQuestion> findByAssessmentTypeAndSubstanceIsNullAndIsDeletedFalseOrderByQuestionOrder(AssessmentType type);
 }

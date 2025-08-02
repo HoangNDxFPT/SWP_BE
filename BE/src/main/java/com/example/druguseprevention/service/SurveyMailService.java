@@ -20,7 +20,7 @@ public class SurveyMailService {
     @Autowired
     private ProgramParticipationRepository participationRepository;
 
-    @Autowired
+//    @Autowired
     private EmailService emailService;
 
     @Autowired

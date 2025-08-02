@@ -5,4 +5,5 @@ import lombok.Data;
 public class AssessmentSubmissionRequest {
     private Long questionId;
     private Long answerId;
+    private Long substanceId; // Thêm field để track substance đã chọn
 }

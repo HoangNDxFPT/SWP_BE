@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -31,6 +32,15 @@ public class Assessment {
     private LocalDateTime createdAt;
 
     private boolean submitted = false;
+
+    // Thay đổi từ single substance thành multiple substances
+    @ManyToMany
+    @JoinTable(
+        name = "assessment_substances",
+        joinColumns = @JoinColumn(name = "assessment_id"),
+        inverseJoinColumns = @JoinColumn(name = "substance_id")
+    )
+    private List<Substance> substances = new ArrayList<>();
 
     @OneToMany(mappedBy = "assessment", cascade = CascadeType.ALL)
     @JsonIgnore

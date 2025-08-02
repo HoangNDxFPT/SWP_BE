@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -74,6 +75,17 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean deleted = false;
 
+    // Add timestamp fields for dashboard analytics
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     @JsonIgnore
