@@ -10,6 +10,7 @@ import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.ProgramParticipationRepository;
 import com.example.druguseprevention.repository.ProgramRepository;
 import com.example.druguseprevention.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,22 +20,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProgramRegistrationService {
 
-    @Autowired
-    private ProgramParticipationRepository participationRepository;
+    private final ProgramParticipationRepository participationRepository;
 
-    @Autowired
-    private ProgramRepository programRepository;
+    private final ProgramRepository programRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    AssessmentService assessmentService;
+    private final AssessmentService assessmentService;
 
-    @Autowired
-    ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
     public void registerUserToProgram(Long programId) {

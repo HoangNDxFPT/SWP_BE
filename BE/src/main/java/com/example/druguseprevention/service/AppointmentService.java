@@ -7,6 +7,7 @@ import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.*;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -18,30 +19,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AppointmentService {
-    @Autowired
-    AppointmentRepository appointmentRepository;
-
-    @Autowired
-    UserSlotRepository userSlotRepository;
-
-    @Autowired
-    AuthenticationRepository authenticationRepository;
-
-    @Autowired
-    AuthenticationService authenticationService;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    ConsultantDetailRepository consultantDetailRepository;
-
-    @Autowired
-    TemplateEngine templateEngine;
-
-    @Autowired
-    EmailService emailService;
+    private final AppointmentRepository appointmentRepository;
+    private final UserSlotRepository userSlotRepository;
+    private final AuthenticationRepository authenticationRepository;
+    private final AuthenticationService authenticationService;
+    private final UserService userService;
+    private final ConsultantDetailRepository consultantDetailRepository;
+    private final TemplateEngine templateEngine;
+    private final EmailService emailService;
 
     @Transactional
     public AppointmentResponse create(AppointmentRequest appointmentRequest) {

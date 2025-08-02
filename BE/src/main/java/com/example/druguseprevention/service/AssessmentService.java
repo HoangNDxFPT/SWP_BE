@@ -25,24 +25,24 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AssessmentService {
-    @Autowired
-    AssessmentRepository assessmentRepository;
-    @Autowired
-    AssessmentResultRepository resultRepository;
-    @Autowired
-    RiskRecommendationRepository riskRecommendationRepository;
-    @Autowired
-    UserAssessmentAnswerRepository userAssessmentAnswerRepository;
-    @Autowired
-    AssessmentQuestionRepository assessmentQuestionRepository;
-    @Autowired
-    AssessmentAnswerRepository assessmentAnswerRepository;
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    RecommendationCourseRepository recommendationCourseRepository;
-    @Autowired
-    CourseRepository courseRepository;
+
+    private final AssessmentRepository assessmentRepository;
+
+    private final AssessmentResultRepository resultRepository;
+
+    private final RiskRecommendationRepository riskRecommendationRepository;
+
+    private final UserAssessmentAnswerRepository userAssessmentAnswerRepository;
+
+    private final AssessmentQuestionRepository assessmentQuestionRepository;
+
+    private final AssessmentAnswerRepository assessmentAnswerRepository;
+
+    private final UserRepository userRepository;
+
+    private final RecommendationCourseRepository recommendationCourseRepository;
+
+    private final CourseRepository courseRepository;
 
 
     public AssessmentResultResponse convertToResponse(AssessmentResult result) {

@@ -3,6 +3,7 @@ package com.example.druguseprevention.controller;
 import com.example.druguseprevention.dto.SurveySendHistoryDTO;
 import com.example.druguseprevention.service.SurveySendHistoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,10 +18,10 @@ import java.util.List;
 @RequestMapping("/api/survey-history")
 @PreAuthorize("hasRole('ADMIN')")
 @SecurityRequirement(name = "api")
+@RequiredArgsConstructor
 public class SurveySendHistoryController {
 
-    @Autowired
-    private SurveySendHistoryService surveySendHistoryService;
+    private final SurveySendHistoryService surveySendHistoryService;
 
     //  Lấy lịch sử gửi khảo sát của một người dùng
     @GetMapping("/user/{userId}")

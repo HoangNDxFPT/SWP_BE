@@ -7,6 +7,7 @@ import com.example.druguseprevention.entity.Slot;
 import com.example.druguseprevention.entity.UserSlot;
 import com.example.druguseprevention.service.SlotService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +20,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/slot")
 @SecurityRequirement(name = "api")
+@RequiredArgsConstructor
 public class SlotController
 {
-    @Autowired
-    SlotService slotService;
+
+    private final SlotService slotService;
 
     @PreAuthorize("hasRole ('ADMIN')")
     // admin chạy 1 lần duy nhất

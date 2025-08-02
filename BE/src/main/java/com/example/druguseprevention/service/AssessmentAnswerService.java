@@ -19,10 +19,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AssessmentAnswerService {
 
-    @Autowired
-    AssessmentAnswerRepository answerRepository;
-    @Autowired
-    AssessmentQuestionRepository assessmentQuestionRepository;
+
+    private final AssessmentAnswerRepository answerRepository;
+
+    private final AssessmentQuestionRepository assessmentQuestionRepository;
 
     public List<AssessmentAnswer> getAllAnswers() {
         return answerRepository.findAll();
