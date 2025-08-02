@@ -6,6 +6,7 @@ import com.example.druguseprevention.enums.SurveySendStatus;
 import com.example.druguseprevention.enums.SurveyType;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -15,28 +16,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SurveyMailService {
 
-    @Autowired
-    private ProgramParticipationRepository participationRepository;
-
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private SurveyTemplateRepository surveyTemplateRepository;
-
-    @Autowired
-    private SurveySendHistoryRepository surveySendHistoryRepository;
-
-    @Autowired
-    private ProgramRepository programRepository;
-
-    @Autowired
-    TemplateEngine templateEngine;
+    private final ProgramParticipationRepository participationRepository;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
+    private final SurveyTemplateRepository surveyTemplateRepository;
+    private final SurveySendHistoryRepository surveySendHistoryRepository;
+    private final ProgramRepository programRepository;
+    private final TemplateEngine templateEngine;
 
     public void sendSurveyToParticipants(Long programId, SurveyType type) {
         Program program = programRepository.findByIdAndIsDeletedFalse(programId)

@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.AssessmentResultResponse;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.service.AssessmentResultService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,10 +19,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/assessment-results")
 @SecurityRequirement(name = "api")
+@RequiredArgsConstructor
 public class AssessmentResultController {
 
-    @Autowired
-    AssessmentResultService assessmentResultService;
+    private final AssessmentResultService assessmentResultService;
 
     @PreAuthorize("hasRole('ADMIN') or hasRole('CONSULTANT')")
     @GetMapping("/user/{userId}")

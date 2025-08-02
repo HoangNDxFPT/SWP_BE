@@ -4,6 +4,7 @@ import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.enums.Gender;
 import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.repository.AuthenticationRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,13 +20,14 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-    @Autowired
-    private AuthenticationRepository authenticationRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final AuthenticationRepository authenticationRepository;
+
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {

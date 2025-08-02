@@ -10,6 +10,7 @@ import com.example.druguseprevention.enums.ReportStatus;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.ReportRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,17 +19,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class ReportService {
-    @Autowired
-    ReportRepository reportRepository;
-    @Autowired
-    AuthenticationService authenticationService;
-    @Autowired
-    AppointmentRepository appointmentRepository;
-    @Autowired
-    UserService userService;
-    @Autowired
-    ModelMapper modelMapper;
+
+    private final ReportRepository reportRepository;
+
+    private final AuthenticationService authenticationService;
+
+    private final AppointmentRepository appointmentRepository;
+
+    private final UserService userService;
+
+    private final ModelMapper modelMapper;
 
     public Report create(ReportRequest reportRequest) {
         User currentMember = userService.getCurrentUser();

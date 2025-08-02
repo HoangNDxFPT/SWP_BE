@@ -5,6 +5,7 @@ import com.example.druguseprevention.entity.Appointment;
 import com.example.druguseprevention.enums.AppointmentStatus;
 import com.example.druguseprevention.service.AppointmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -18,9 +19,10 @@ import java.util.List;
 @RestController
 @SecurityRequirement(name = "api")
 @RequestMapping("/api/appointment")
+@RequiredArgsConstructor
 public class AppointmentController {
-    @Autowired
-    private AppointmentService appointmentService;
+
+    private final AppointmentService appointmentService;
 
     // tạo cuộc hẹn
     @PostMapping
