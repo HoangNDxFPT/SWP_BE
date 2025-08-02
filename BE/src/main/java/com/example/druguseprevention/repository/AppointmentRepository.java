@@ -1,6 +1,7 @@
 package com.example.druguseprevention.repository;
 
 import com.example.druguseprevention.entity.Appointment;
+import com.example.druguseprevention.entity.Slot;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.entity.UserSlot;
 import com.example.druguseprevention.enums.AppointmentStatus;
@@ -30,5 +31,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("consultant") User consultant,
             @Param("member") User member,
             @Param("date") LocalDate date
+    );
+
+    @Query("SELECT COUNT(a) FROM Appointment a " +
+            "WHERE a.member = :member " +
+            "AND a.userSlot.date = :date " +
+            "AND a.userSlot.slot = :slot " +
+            "AND a.status != com.example.druguseprevention.enums.AppointmentStatus.CANCELLED")
+    long countActiveAppointmentsByMemberAndDateAndSlot(
+            @Param("member") User member,
+            @Param("date") LocalDate date,
+            @Param("slot") Slot slot
     );
 }
