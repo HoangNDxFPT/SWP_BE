@@ -7,6 +7,7 @@ import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.*;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
@@ -18,30 +19,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class AppointmentService {
-    @Autowired
-    AppointmentRepository appointmentRepository;
-
-    @Autowired
-    UserSlotRepository userSlotRepository;
-
-    @Autowired
-    AuthenticationRepository authenticationRepository;
-
-    @Autowired
-    AuthenticationService authenticationService;
-
-    @Autowired
-    UserService userService;
-
-    @Autowired
-    ConsultantDetailRepository consultantDetailRepository;
-
-    @Autowired
-    TemplateEngine templateEngine;
-
-    @Autowired
-    EmailService emailService;
+    private final AppointmentRepository appointmentRepository;
+    private final UserSlotRepository userSlotRepository;
+    private final AuthenticationRepository authenticationRepository;
+    private final AuthenticationService authenticationService;
+    private final UserService userService;
+    private final ConsultantDetailRepository consultantDetailRepository;
+    private final TemplateEngine templateEngine;
+    private final EmailService emailService;
 
     @Transactional
     public AppointmentResponse create(AppointmentRequest appointmentRequest) {
@@ -67,7 +54,22 @@ public class AppointmentService {
         // 3. Lấy người dùng hiện tại
         User currentMember = userService.getCurrentUser();
 
-        // 4. Tạo Appointment
+        //4. Kiểm tra xem người dùng đã có lịch hẹn nào trong ngày và slot này chưa
+        long conflictCount = appointmentRepository.countActiveAppointmentsByMemberAndDateAndSlot(
+                currentMember,
+                appointmentRequest.getAppointmentDate(),
+                slot.getSlot()
+        );
+
+        if (conflictCount > 0) {
+            throw new BadRequestException(
+                    "You already have an appointment at this time slot on " +
+                            appointmentRequest.getAppointmentDate() +
+                            " (" + slot.getSlot().getStart() + " - " + slot.getSlot().getEnd() + ")"
+            );
+        }
+
+        // 5. Tạo Appointment
         Appointment appointment = new Appointment();
         appointment.setCreateAt(LocalDate.now());
         appointment.setStatus(AppointmentStatus.PENDING);
@@ -75,18 +77,18 @@ public class AppointmentService {
         appointment.setUserSlot(slot);
         appointmentRepository.save(appointment);
 
-        // 5. Đánh dấu slot đã được đặt
+        // 6. Đánh dấu slot đã được đặt
         slot.setAvailable(false);
 
 
-        // 6. Lấy link Google Meet từ ConsultantDetail
+        // 7. Lấy link Google Meet từ ConsultantDetail
         ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                 .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
-        // 7. Trả về response có thông tin meet link
+        // 8. Trả về response có thông tin meet link
         Slot slotInfo = slot.getSlot();
 
-        // 8. Gửi mail khi đặt lịch thành công
+        // 9. Gửi mail khi đặt lịch thành công
         EmailDetail emailDetail = new EmailDetail();
         emailDetail.setRecipient(currentMember.getEmail());
         emailDetail.setSubject("Xác nhận lịch hẹn với chuyên viên tư vấn");
@@ -141,7 +143,22 @@ public class AppointmentService {
             throw new BadRequestException("Slot not available");
         }
 
-        // 4. Tạo cuộc hẹn
+        // 4. Kiểm tra xem member đã có lịch hẹn nào trong ngày và slot này chưa
+        long conflictCount = appointmentRepository.countActiveAppointmentsByMemberAndDateAndSlot(
+                member,
+                request.getAppointmentDate(),
+                slot.getSlot()
+        );
+
+        if (conflictCount > 0) {
+            throw new BadRequestException(
+                    "This member already has an appointment at this time slot on " +
+                            request.getAppointmentDate() +
+                            " (" + slot.getSlot().getStart() + " - " + slot.getSlot().getEnd() + ")"
+            );
+        }
+
+        // 5. Tạo cuộc hẹn
         Appointment appointment = new Appointment();
         appointment.setCreateAt(LocalDate.now());
         appointment.setStatus(AppointmentStatus.PENDING);
@@ -149,14 +166,14 @@ public class AppointmentService {
         appointment.setUserSlot(slot);
         appointmentRepository.save(appointment);
 
-        // 5. Đánh dấu slot là đã đặt
+        // 6. Đánh dấu slot là đã đặt
         slot.setAvailable(false);
 
-        // 6. Lấy meet link
+        // 7. Lấy meet link
         ConsultantDetail detail = (ConsultantDetail) consultantDetailRepository.findByConsultant(consultant)
                 .orElseThrow(() -> new BadRequestException("Consultant detail not found"));
 
-        // 7. Gửi mail xác nhận đến member
+        // 8. Gửi mail xác nhận đến member
         EmailDetail emailDetail = new EmailDetail();
         emailDetail.setRecipient(member.getEmail());
         emailDetail.setSubject("Xác nhận lịch hẹn với chuyên viên tư vấn");
@@ -175,7 +192,7 @@ public class AppointmentService {
         emailService.sendHtmlEmail(emailDetail, html);
 
 
-        // 8. Trả về response
+        // 9. Trả về response
 
         return new AppointmentResponseForConsultant(
                 appointment.getId(),

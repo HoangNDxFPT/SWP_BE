@@ -13,10 +13,10 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class AssessmentResultService {
-    @Autowired
-    AssessmentResultRepository resultRepository;
-    @Autowired
-    AssessmentService assessmentService;
+
+    private final AssessmentResultRepository resultRepository;
+
+    private final AssessmentService assessmentService;
 
     public AssessmentResultResponse getResultById(Long id) {
         AssessmentResult result = resultRepository.findById(id)

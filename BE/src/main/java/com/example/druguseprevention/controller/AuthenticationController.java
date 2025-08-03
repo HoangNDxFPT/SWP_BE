@@ -5,19 +5,20 @@ import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.service.AuthenticationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.*;
 
-
+@RequiredArgsConstructor
 @RestController
 @CrossOrigin("*")// cho phép tất cả truy cập
 public class AuthenticationController {
 
-    @Autowired
-    AuthenticationService authenticationService;
+
+    private final AuthenticationService authenticationService;
 
     @PostMapping("/api/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest registerRequest){
@@ -55,6 +56,18 @@ public class AuthenticationController {
     public ResponseEntity<?> logout() {
         // Client sẽ tự xóa token, backend chỉ phản hồi xác nhận
         return ResponseEntity.ok("Logout successfully!");
+    }
+
+    @GetMapping("/api/activate")
+    public ResponseEntity<String> activateAccount(@RequestParam String token) {
+        authenticationService.activateAccount(token);
+        return ResponseEntity.ok("Account activated successfully! You can now login.");
+    }
+
+    @PostMapping("/api/resend-activation")
+    public ResponseEntity<String> resendActivationEmail(@RequestParam String email) {
+        authenticationService.resendActivationEmail(email);
+        return ResponseEntity.ok("Activation email has been resent. Please check your inbox.");
     }
 
 }

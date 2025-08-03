@@ -48,7 +48,9 @@ public class Filter extends OncePerRequestFilter {
             "GET:/oauth2/**",
             "POST:/oauth2/**",
             "GET:/login/oauth2/**",
-            "GET:/auth/oauth2/success"
+            "GET:/auth/oauth2/success",
+            "GET:/api/activate",
+            "POST:/api/resend-activation"
     );
 
     public boolean isPublicAPI(String uri, String method) {

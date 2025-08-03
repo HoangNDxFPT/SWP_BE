@@ -24,8 +24,7 @@ import java.util.List;
 @SecurityRequirement(name = "api")
 public class AssessmentController {
 
-    @Autowired
-    private AssessmentService assessmentService;
+    private final AssessmentService assessmentService;
 
 
 

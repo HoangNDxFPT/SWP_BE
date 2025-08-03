@@ -5,7 +5,6 @@ import com.example.druguseprevention.enums.Role;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +14,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,6 +56,11 @@ public class User implements UserDetails {
     Role role;
 
     @Override
+    public boolean isEnabled() {
+        return !deleted && isActive; // Phải active VÀ chưa bị delete
+    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role));
     }
@@ -75,17 +78,11 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean deleted = false;
 
-    // Add timestamp fields for dashboard analytics
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    @Column(nullable = false)
+    private boolean isActive = false;
 
-    @Column(name = "last_login_at")
-    private LocalDateTime lastLoginAt;
-
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-    }
+    @Column(length = 500)
+    private String activationToken;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     @JsonIgnore

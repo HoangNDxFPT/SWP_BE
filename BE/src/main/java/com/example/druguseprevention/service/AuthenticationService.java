@@ -6,6 +6,7 @@ import com.example.druguseprevention.enums.Role;
 import com.example.druguseprevention.exception.exceptions.AuthenticationException;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.AuthenticationRepository;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,35 +22,33 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.util.UUID;
+
+
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService implements UserDetailsService {
 
-    @Autowired
-    AuthenticationRepository authenticationRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
+    private final AuthenticationRepository authenticationRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final ModelMapper modelMapper;
+    private final TokenService tokenService;
+    private final EmailService emailService;
+    private final TemplateEngine templateEngine;
+    // AuthenticationManager cần @Lazy để tránh circular dependency
     @Autowired
     @Lazy
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    ModelMapper modelMapper;
-
-    @Autowired
-    TokenService tokenService;
-
-    @Autowired
-    EmailService emailService;
-
-    @Autowired
-    TemplateEngine templateEngine;
+    @Value("${app.verifyEmail.url}")
+    private String verifyEmailUrl;
 
     @Value("${app.resetPassword.url}")
-    public String restPassword;
+    private String resetPasswordUrl;
 
-    public User register (RegisterRequest registerRequest){
+
+
+    public User register(RegisterRequest registerRequest) {
         if (authenticationRepository.findUserByUserName(registerRequest.getUserName()) != null) {
             throw new BadRequestException("Username already exists!");
         }
@@ -57,16 +56,68 @@ public class AuthenticationService implements UserDetailsService {
         if (authenticationRepository.findUserByEmail(registerRequest.getEmail()) != null) {
             throw new BadRequestException("Email already exists!");
         }
+
         User user = modelMapper.map(registerRequest, User.class);
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        // Gán role mặc định là "Member"
         user.setRole(Role.MEMBER);
-        // Send email
+        user.setDeleted(false);
+        user.setActive(false);
+
+        // Tạo activation token
+        String activationToken = UUID.randomUUID().toString();
+        user.setActivationToken(activationToken);
+
+        user = authenticationRepository.save(user);
+        sendActivationEmail(user);
+        return user;
+    }
+
+    private void sendActivationEmail(User user){
         EmailDetail emailDetail = new EmailDetail();
         emailDetail.setRecipient(user.getEmail());
-        emailDetail.setSubject("Welcome to my system");
-        emailService.sendEmail(emailDetail,user);
-        return authenticationRepository.save(user);
+        emailDetail.setSubject("Activate your account");
+
+        Context context = new Context();
+        context.setVariable("name", user.getFullName());
+        context.setVariable("button", "Activate Account");
+//        context.setVariable("link", verifyEmailUrl + user.getActivationToken()); // đường link frontend
+
+        String html = templateEngine.process("emailtemplate", context);
+        emailService.sendHtmlEmail(emailDetail, html);
+    }
+
+    public void resendActivationEmail(String email) {
+        User user = authenticationRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new BadRequestException("User not found with this email.");
+        }
+
+        if (user.isActive()) {
+            throw new BadRequestException("Account is already activated.");
+        }
+
+        // Tạo token mới
+        String newToken = UUID.randomUUID().toString();
+        user.setActivationToken(newToken);
+        authenticationRepository.save(user);
+
+        // Gửi lại email
+        sendActivationEmail(user);
+    }
+
+    public void activateAccount(String token) {
+        User user = authenticationRepository.findByActivationToken(token);
+        if (user == null) {
+            throw new BadRequestException("Invalid activation token.");
+        }
+
+        if (user.isActive()) {
+            throw new BadRequestException("Account is already activated.");
+        }
+
+        user.setActive(true);
+        user.setActivationToken(null); // Xóa token sau khi kích hoạt
+        authenticationRepository.save(user);
     }
 
     public UserResponse login (LoginRequest loginRequest){
@@ -80,6 +131,16 @@ public class AuthenticationService implements UserDetailsService {
             throw new AuthenticationException("Username or Password not valid!");
         }
         User user = authenticationRepository.findUserByUserName(loginRequest.getUserName());
+
+        // Kiểm tra user có bị xóa không
+        if (user.isDeleted()) {
+            throw new AuthenticationException("Account has been deleted.");
+        }
+
+        // Kiểm tra tài khoản đã được kích hoạt chưa
+        if(!user.isActive()){
+            throw new BadRequestException("Account is not activated. Please check your email.");
+        }
         UserResponse userResponse = modelMapper.map(user, UserResponse.class);
         String token = tokenService.generateToken(user);
         userResponse.setToken(token);
@@ -110,7 +171,7 @@ public class AuthenticationService implements UserDetailsService {
         Context context = new Context();
         context.setVariable("name", user.getFullName());
         context.setVariable("button", "Reset Password");
-        context.setVariable("link", restPassword + token); // đường link frontend
+        context.setVariable("link", resetPasswordUrl + token); // đường link frontend
 
         String html = templateEngine.process("resetpasswordtemplate", context);
         emailService.sendHtmlEmail(detail, html);
@@ -143,12 +204,16 @@ public class AuthenticationService implements UserDetailsService {
         user.setAddress(request.getAddress());
         user.setDateOfBirth(request.getDateOfBirth());
         user.setGender(request.getGender());
+        user.setActive(true);
 
         // Admin chọn role
         user.setRole(request.getRole() != null ? request.getRole() : Role.MEMBER);
 
         return authenticationRepository.save(user);
     }
+
+
+
     
 
 }

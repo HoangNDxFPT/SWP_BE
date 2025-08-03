@@ -3,6 +3,7 @@ package com.example.druguseprevention.service;
 import com.example.druguseprevention.entity.Program;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.ProgramRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,10 +11,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ProgramService {
-    @Autowired
-    ProgramRepository programRepository;
 
+    private final ProgramRepository programRepository;
 
 
     public List<Program> getAllPrograms() {

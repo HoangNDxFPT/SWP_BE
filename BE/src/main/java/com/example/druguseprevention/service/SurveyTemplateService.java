@@ -3,6 +3,7 @@ package com.example.druguseprevention.service;
 import com.example.druguseprevention.entity.SurveyTemplate;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.SurveyTemplateRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class SurveyTemplateService {
 
-    @Autowired
-    private SurveyTemplateRepository surveyTemplateRepository;
+    private final SurveyTemplateRepository surveyTemplateRepository;
 
     public List<SurveyTemplate> getAllTemplates() {
         return surveyTemplateRepository.findByIsDeletedFalse();

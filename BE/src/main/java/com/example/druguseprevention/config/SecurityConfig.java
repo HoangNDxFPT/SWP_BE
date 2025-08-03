@@ -88,7 +88,9 @@ public class SecurityConfig {
                                         "/oauth2/code/google",
                                         "/oauth2/**",                          // Cho phép Spring xử lý OAuth2
                                         "/login/oauth2/**",
-                                        "/auth/oauth2/success"
+                                        "/auth/oauth2/success",
+                                        "/api/activate",
+                                        "/api/resend-activation"
                                 ).permitAll()
                                 // Add Swagger 3 endpoints to permitAll()
                                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
