@@ -3,7 +3,7 @@ package com.example.druguseprevention.dto;
 import lombok.Data;
 
 @Data
-public class ConsultantProfileDto {
+public class ConsultantFullProfileDto {
     private Long consultantId;
     private String fullName;
     private String phoneNumber;

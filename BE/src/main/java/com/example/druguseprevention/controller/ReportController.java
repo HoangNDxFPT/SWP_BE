@@ -6,6 +6,7 @@ import com.example.druguseprevention.dto.UpdateReportRequest;
 import com.example.druguseprevention.entity.Report;
 import com.example.druguseprevention.service.ReportService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,10 @@ import java.util.List;
 @RestController
 @SecurityRequirement(name = "api")
 @RequestMapping("/api/report")
+@RequiredArgsConstructor
 public class ReportController {
-    @Autowired
-    private ReportService reportService;
+
+    private final ReportService reportService;
 
     @PostMapping
     public ResponseEntity<Report> createReport(ReportRequest reportRequest) {

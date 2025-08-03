@@ -24,4 +24,6 @@ public interface CourseQuizResultService {
 
 
     List<CourseQuizResultDto> getResultDtosByUserId(Long id);
+
+    List<CourseQuizResultDto> getAllResultDtos();
 }

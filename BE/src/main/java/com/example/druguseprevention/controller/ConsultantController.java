@@ -67,9 +67,11 @@ public class ConsultantController {
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
     @GetMapping("/all")
-    public ResponseEntity<List<ConsultantPublicProfileDto>> getAllConsultants() {
-        return ResponseEntity.ok(consultantService.getAllConsultants());
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ConsultantFullProfileDto>> getAllConsultants() {
+        return ResponseEntity.ok(consultantService.getAllConsultantFullProfiles());
     }
+
     @SecurityRequirement(name = "api")
     @SecurityRequirement(name = "bearer-key")
     @PreAuthorize("hasRole('ADMIN')")

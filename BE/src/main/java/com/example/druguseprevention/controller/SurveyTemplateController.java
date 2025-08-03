@@ -3,7 +3,7 @@ package com.example.druguseprevention.controller;
 import com.example.druguseprevention.entity.SurveyTemplate;
 import com.example.druguseprevention.service.SurveyTemplateService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +14,10 @@ import java.util.List;
 @RequestMapping("/api/survey-templates")
 @SecurityRequirement(name = "api")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
 public class SurveyTemplateController {
 
-    @Autowired
-    private SurveyTemplateService surveyTemplateService;
+    private final SurveyTemplateService surveyTemplateService;
 
     @GetMapping
     public List<SurveyTemplate> getAllTemplates() {

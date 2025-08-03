@@ -14,26 +14,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // Tự động tạo constructor với các final field
 public class CourseQuizServiceImpl implements CourseQuizService {
 
+    // Inject các repository cần thiết
     private final CourseQuizRepository quizRepository;
     private final CourseRepository courseRepository;
-    private final CourseQuizResultRepository resultRepository; // ✅ injected
+    private final CourseQuizResultRepository resultRepository;
 
+    // Lấy danh sách quiz theo ID khóa học
     @Override
     public List<CourseQuizDto> getQuizByCourseId(Long courseId) {
-        return quizRepository.findByCourseId(courseId).stream().map(q -> {
-            CourseQuizDto dto = new CourseQuizDto();
-            dto.setId(q.getId());
-            dto.setCourseId(q.getCourse().getId());
-            dto.setQuestion(q.getQuestion());
-            dto.setAnswer(q.getAnswer());
-            dto.setCorrect(q.getCorrect());
-            return dto;
-        }).collect(Collectors.toList());
+        return quizRepository.findByCourseId(courseId)
+                .stream()
+                .map(q -> {
+                    CourseQuizDto dto = new CourseQuizDto();
+                    dto.setId(q.getId());
+                    dto.setCourseId(q.getCourse().getId());
+                    dto.setQuestion(q.getQuestion());
+                    dto.setAnswer(q.getAnswer());
+                    dto.setCorrect(q.getCorrect());
+                    return dto;
+                })
+                .collect(Collectors.toList());
     }
 
+    // Tạo quiz mới từ DTO
     @Override
     public CourseQuizDto createQuiz(CourseQuizDto dto) {
         Course course = courseRepository.findById(dto.getCourseId())
@@ -45,17 +51,18 @@ public class CourseQuizServiceImpl implements CourseQuizService {
         quiz.setAnswer(dto.getAnswer());
         quiz.setCorrect(dto.getCorrect());
 
-        quiz = quizRepository.save(quiz);
+        quiz = quizRepository.save(quiz); // Lưu vào DB
 
-        dto.setId(quiz.getId());
+        dto.setId(quiz.getId()); // Cập nhật lại ID vào DTO
         return dto;
     }
+
+    // Cập nhật quiz theo ID
     @Override
     public CourseQuizDto updateQuiz(Long id, CourseQuizDto dto) {
         CourseQuiz quiz = quizRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Quiz not found"));
 
-        // Only update fields that are provided
         quiz.setQuestion(dto.getQuestion());
         quiz.setAnswer(dto.getAnswer());
         quiz.setCorrect(dto.getCorrect());
@@ -66,17 +73,18 @@ public class CourseQuizServiceImpl implements CourseQuizService {
         return dto;
     }
 
+    // Xoá quiz theo ID
     @Override
     public void deleteQuiz(Long id) {
         quizRepository.deleteById(id);
     }
 
-    // ✅ Trả về danh sách ID khóa học mà user đã hoàn thành (điểm >= 60%)
+    // Lấy danh sách ID khóa học mà user đã hoàn thành (điểm >= 80%)
     @Override
     public List<Long> getCompletedCourseIdsByUserId(Long userId) {
         List<CourseQuizResult> results = resultRepository.findByUserId(userId);
         return results.stream()
-                .filter(result -> result.getScore() >= 0.6 * result.getTotalQuestions())
+                .filter(result -> result.getScore() >= 0.8 * result.getTotalQuestions()) // >= 80%
                 .map(result -> result.getCourse().getId())
                 .distinct()
                 .toList();

@@ -33,7 +33,6 @@ public class Filter extends OncePerRequestFilter {
     @Autowired
     TokenService tokenService;
 
-    // Chỉ các API này mới là public, các API khác đều cần xác thực
     private final List<String> PUBLIC_API = List.of(
             "POST:/api/register",
             "POST:/api/login",
@@ -41,14 +40,17 @@ public class Filter extends OncePerRequestFilter {
             "POST:/api/reset-password",
             "GET:/v3/api-docs/**",
             "GET:/swagger-ui/**",
-            "GET:/api/consultant/public/**", // Thêm dòng này
-            "GET:/api/public/all", //
-            "GET:/swagger-ui.html"
-
-
-//            "GET:/api/profile/{id}"
-
-            // Nếu có GET public, thêm vào đây, ví dụ: "GET:/api/public-resource"
+            "GET:/api/consultant/public/**",
+            "GET:/api/public/all",
+            "GET:/swagger-ui.html",
+            // Thêm OAuth2 endpoints
+            "GET:/oauth2/code/google",
+            "GET:/oauth2/**",
+            "POST:/oauth2/**",
+            "GET:/login/oauth2/**",
+            "GET:/auth/oauth2/success",
+            "GET:/api/activate",
+            "POST:/api/resend-activation"
     );
 
     public boolean isPublicAPI(String uri, String method) {
@@ -58,7 +60,7 @@ public class Filter extends OncePerRequestFilter {
             if (parts.length != 2) return false;
             String allowedMethod = parts[0];
             String allowedUri = parts[1];
-            return method.equalsIgnoreCase(allowedMethod) && matcher.match(allowedUri, uri);
+            return allowedMethod.equalsIgnoreCase(method) && matcher.match(allowedUri, uri);
         });
     }
 
@@ -69,37 +71,39 @@ public class Filter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
         String uri = request.getRequestURI();
         String method = request.getMethod();
 
-        if (isPublicAPI(uri, method)) {
+        // Cho phép tất cả OPTIONS requests (CORS preflight)
+        if ("OPTIONS".equalsIgnoreCase(method) || isPublicAPI(uri, method)) {
             filterChain.doFilter(request, response);
-        } else {
-            String token = getToken(request);
+            return;
+        }
 
-            if (token == null) {
-                resolver.resolveException(request, response, null, new AuthenticationException("Empty token!") {});
-                return;
-            }
+        String token = getToken(request);
 
-            User user;
-            try {
-                user = tokenService.extractAccount(token);
-            } catch (ExpiredJwtException expiredJwtException) {
-                resolver.resolveException(request, response, null, new AuthException("Expired Token!"));
-                return;
-            } catch (MalformedJwtException malformedJwtException) {
-                resolver.resolveException(request, response, null, new AuthException("Invalid Token!"));
-                return;
-            }
+        if (token == null) {
+            resolver.resolveException(request, response, null, new AuthenticationException("Empty token!") {});
+            return;
+        }
+
+        try {
+            User user = tokenService.extractAccount(token);
 
             UsernamePasswordAuthenticationToken authenToken =
-                    new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             authenToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenToken);
 
             filterChain.doFilter(request, response);
+
+        } catch (ExpiredJwtException e) {
+            resolver.resolveException(request, response, null, new AuthException("Expired Token!"));
+        } catch (MalformedJwtException e) {
+            resolver.resolveException(request, response, null, new AuthException("Invalid Token!"));
         }
     }
 }

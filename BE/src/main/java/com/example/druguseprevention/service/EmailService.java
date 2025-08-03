@@ -3,6 +3,7 @@ package com.example.druguseprevention.service;
 import com.example.druguseprevention.dto.EmailDetail;
 import com.example.druguseprevention.entity.User;
 import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -11,13 +12,14 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 @Service
+@RequiredArgsConstructor
 public class EmailService {
 
-    @Autowired
-    private TemplateEngine templateEngine;
 
-    @Autowired
-    private JavaMailSender javaMailSender;
+    private final TemplateEngine templateEngine;
+
+
+    private final JavaMailSender javaMailSender;
 
 
     public void sendEmail(EmailDetail emailDetail, User user) {
@@ -26,7 +28,7 @@ public class EmailService {
             Context context = new Context();
             context.setVariable("name", user.getFullName());
             context.setVariable("button", "Login");
-            context.setVariable("link", "http://localhost:5173/login");
+            context.setVariable("link", "https://swp-fe-sandy.vercel.app/login");
             String html = templateEngine.process("emailtemplate", context);
 
             // Creating a simple mail message

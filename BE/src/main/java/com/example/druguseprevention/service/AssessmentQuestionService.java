@@ -15,8 +15,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AssessmentQuestionService {
 
-    @Autowired
-    AssessmentQuestionRepository questionRepository;
+    private final AssessmentQuestionRepository questionRepository;
 
     public List<AssessmentQuestion> getAllQuestions() {
         return questionRepository.findAll(); // lấy tất cả, kể cả bị xóa

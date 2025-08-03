@@ -13,6 +13,7 @@ import com.example.druguseprevention.repository.AppointmentRepository;
 import com.example.druguseprevention.repository.AuthenticationRepository;
 import com.example.druguseprevention.repository.SlotRepository;
 import com.example.druguseprevention.repository.UserSlotRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,18 +25,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class SlotService {
-    @Autowired
-    AuthenticationRepository authenticationRepository;
-    @Autowired
-    SlotRepository slotRepository;
-    @Autowired
-    UserSlotRepository userSlotRepository;
-    @Autowired
-    UserService userService;
 
-    @Autowired
-    AppointmentRepository appointmentRepository;
+    private final AuthenticationRepository authenticationRepository;
+    private final SlotRepository slotRepository;
+    private final UserSlotRepository userSlotRepository;
+    private final UserService userService;
+    private final AppointmentRepository appointmentRepository;
 
     public List<Slot> get()
     {

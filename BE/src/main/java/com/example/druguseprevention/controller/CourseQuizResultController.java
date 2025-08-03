@@ -32,7 +32,7 @@ public class CourseQuizResultController {
     private final CourseQuizResultDetailRepository courseQuizResultDetailRepository;
     private final CourseQuizResultService courseQuizResultService;
 
-    @PostMapping("/api/quiz-result-submit/")
+    @PostMapping("/submit")
     public ResponseEntity<CourseQuizResultFullResponse> submitQuiz(
             @RequestBody QuizSubmitRequest request,
             @AuthenticationPrincipal User user) {
@@ -45,12 +45,12 @@ public class CourseQuizResultController {
 
     // Chỉ Admin xem toàn bộ kết quả
     @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<CourseQuizResult> getAll() {
-        return service.findAll();
+    @GetMapping("/all")
+    public ResponseEntity<List<CourseQuizResultDto>> getAll() {
+        return ResponseEntity.ok(service.getAllResultDtos());
     }
 
-    // Admin
+
     @GetMapping("/{id}")
     public ResponseEntity<CourseQuizResult> getById(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(service.findById(id));

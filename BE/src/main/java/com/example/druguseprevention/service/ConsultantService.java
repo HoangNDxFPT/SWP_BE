@@ -1,5 +1,6 @@
 package com.example.druguseprevention.service;
 
+import com.example.druguseprevention.dto.ConsultantFullProfileDto;
 import com.example.druguseprevention.dto.ConsultantProfileDto;
 import com.example.druguseprevention.dto.ConsultantPublicProfileDto;
 import com.example.druguseprevention.dto.UserProfileDto;
@@ -17,5 +18,5 @@ public interface ConsultantService {
     ConsultantDetail getConsultantDetailById(Long consultantId);
     List<ConsultantPublicProfileDto> getAllConsultants();
     List<ConsultantPublicProfileDto> getAllPublicConsultants();
-
+    List<ConsultantFullProfileDto> getAllConsultantFullProfiles();
 }
