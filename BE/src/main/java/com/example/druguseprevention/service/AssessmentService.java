@@ -62,6 +62,14 @@ public class AssessmentService {
             detail.setAnswerId(userAnswer.getAnswer().getId());
             detail.setAnswerText(userAnswer.getAnswer().getAnswerText());
             detail.setScore(userAnswer.getAnswer().getScore());
+
+            // Thêm thông tin substance nếu có
+            if (userAnswer.getSubstance() != null) {
+                detail.setSubstanceId(userAnswer.getSubstance().getId());
+                detail.setSubstanceName(userAnswer.getSubstance().getName());
+                detail.setSubstanceDescription(userAnswer.getSubstance().getDescription());
+            }
+
             return detail;
         }).toList();
 
@@ -270,26 +278,17 @@ public AssessmentStartResponse startAssessment(AssessmentType type) {
     // dùng để tính điểm riêng biệt từng bài đánh giá theo loại
     public RiskLevel determineRiskLevel(AssessmentType type, int totalScore) {
         switch (type) {
-            case ASSIST:
-                if (totalScore < 10) {
-                    return RiskLevel.LOW;
-                } else if (totalScore < 20) {
-                    return RiskLevel.MEDIUM;
-                } else {
-                    return RiskLevel.HIGH;
-                }
-
             case CRAFFT:
-                if (totalScore < 1) {
+                if (totalScore <= 1) {
                     return RiskLevel.LOW;
-                } else if (totalScore < 2) {
+                } else if (totalScore <= 3) {
                     return RiskLevel.MEDIUM;
                 } else {
                     return RiskLevel.HIGH;
                 }
 
             default:
-                throw new IllegalArgumentException("Unsupported assessment type for risk evaluation: " + type);
+                throw new IllegalArgumentException("Unsupported assessment type for risk evaluation: " + type + ". Use specialized service instead.");
         }
     }
 

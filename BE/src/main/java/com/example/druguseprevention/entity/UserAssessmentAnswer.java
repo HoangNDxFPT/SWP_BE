@@ -30,5 +30,9 @@ public class UserAssessmentAnswer {
     @JoinColumn(name="answer_id")
     private AssessmentAnswer answer;
 
+    @ManyToOne
+    @JoinColumn(name="substance_id")
+    private Substance substance;
+
     private LocalDateTime selectedAt;
 }
