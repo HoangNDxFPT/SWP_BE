@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,31 +46,61 @@ public class AssistService {
         assessment.setSubmitted(true);
         assessment = assessmentRepository.save(assessment);
 
-        // 2. Xử lý từng substance riêng biệt (Q2-Q8 cho mỗi substance)
+        // 2. Xử lý từng substance riêng biệt
         List<AssistResultResponse.SubstanceResult> substanceResults = new ArrayList<>();
         List<UserAssessmentAnswer> allUserAnswers = new ArrayList<>();
         RiskLevel highestRiskLevel = RiskLevel.LOW;
         int totalOverallScore = 0;
+        AssistResultResponse.InjectionResult injectionResult = null; // Kết quả injection từ Q8
 
         for (AssistSubmissionRequest.SubstanceAssessment substanceAssessment : request.getSubstanceAssessments()) {
             // Lấy thông tin substance
             Substance substance = substanceRepository.findByIdAndIsDeletedFalse(substanceAssessment.getSubstanceId())
                 .orElseThrow(() -> new BadRequestException("Substance not found: " + substanceAssessment.getSubstanceId()));
 
-            // Lấy questions Q2-Q8 cho substance này (bao gồm cả injection)
+            // Lấy questions Q2-Q8 cho substance này
             List<AssessmentQuestion> questions = assessmentQuestionRepository
                 .findByAssessmentTypeAndIsDeletedFalseOrderByQuestionOrder(AssessmentType.ASSIST)
                 .stream()
                 .filter(q -> q.getQuestionOrder() >= 2 && q.getQuestionOrder() <= 8)
                 .toList();
 
+            // Kiểm tra Q2 để xác định có sử dụng trong 3 tháng qua không
+            boolean usedInPast3Months = true; // Mặc định là có sử dụng
+            if (!substanceAssessment.getAnswerIds().isEmpty() && !questions.isEmpty()) {
+                AssessmentQuestion q2 = questions.get(0); // Q2 là câu đầu tiên
+                if (q2.getQuestionOrder() == 2) {
+                    Long q2AnswerId = substanceAssessment.getAnswerIds().get(0);
+                    AssessmentAnswer q2Answer = assessmentAnswerRepository.findById(q2AnswerId)
+                        .orElseThrow(() -> new BadRequestException("Answer not found: " + q2AnswerId));
+
+                    // Nếu điểm = 0 thì là "Never" = không sử dụng trong 3 tháng qua
+                    usedInPast3Months = q2Answer.getScore() > 0;
+                }
+            }
+
             // Tính điểm cho substance này
             int substanceScore = 0;
             List<AssistResultResponse.QuestionAnswer> questionAnswers = new ArrayList<>();
 
-            for (int i = 0; i < substanceAssessment.getAnswerIds().size() && i < questions.size(); i++) {
-                AssessmentQuestion question = questions.get(i);
-                Long answerId = substanceAssessment.getAnswerIds().get(i);
+            int answerIndex = 0; // Track current position in answerIds array
+
+            for (int questionIndex = 0; questionIndex < questions.size(); questionIndex++) {
+                AssessmentQuestion question = questions.get(questionIndex);
+
+                // Skip Q3, Q4, Q5 nếu Q2 trả lời "Never" (không sử dụng trong 3 tháng qua)
+                // Nhưng vẫn làm Q6, Q7, Q8
+                if (!usedInPast3Months && (question.getQuestionOrder() >= 3 && question.getQuestionOrder() <= 5)) {
+                    continue; // Skip question nhưng không tăng answerIndex
+                }
+
+                // Kiểm tra có đủ answer không
+                if (answerIndex >= substanceAssessment.getAnswerIds().size()) {
+                    break;
+                }
+
+                Long answerId = substanceAssessment.getAnswerIds().get(answerIndex);
+                answerIndex++; // Tăng answerIndex sau khi sử dụng
 
                 AssessmentAnswer answer = assessmentAnswerRepository.findById(answerId)
                     .orElseThrow(() -> new BadRequestException("Answer not found: " + answerId));
@@ -79,15 +110,32 @@ public class AssistService {
                     throw new BadRequestException("Answer does not belong to question");
                 }
 
-                // Cộng điểm cho substance này
+                // Cộng điểm cho substance này (Q8 không cộng điểm vào substance score)
                 int answerScore = Optional.ofNullable(answer.getScore()).orElse(0);
-                substanceScore += answerScore;
+                if (question.getQuestionOrder() != 8) {
+                    substanceScore += answerScore;
+                } else {
+                    // Xử lý Q8 injection question - chỉ lấy 1 lần cho toàn bộ assessment
+                    if (injectionResult == null) {
+                        injectionResult = new AssistResultResponse.InjectionResult();
+                        injectionResult.setQuestionText(question.getQuestionText());
+                        injectionResult.setAnswerText(answer.getAnswerText());
+                        injectionResult.setScore(answerScore);
 
-                // Lưu user answer với substance info (Q8 injection cũng gắn với substance)
+                        // Đánh giá risk injection
+                        if (answerScore > 0) {
+                            injectionResult.setRiskAssessment("Injection risk detected - Substance use by injection increases health risks significantly");
+                        } else {
+                            injectionResult.setRiskAssessment("No injection risk detected");
+                        }
+                    }
+                }
+
+                // Lưu user answer với substance info
                 UserAssessmentAnswer userAnswer = new UserAssessmentAnswer();
                 userAnswer.setQuestion(question);
                 userAnswer.setAnswer(answer);
-                userAnswer.setSubstance(substance); // Cả Q8 cũng gắn với substance
+                userAnswer.setSubstance(substance);
                 userAnswer.setSelectedAt(LocalDateTime.now());
                 allUserAnswers.add(userAnswer);
 
@@ -162,6 +210,7 @@ public class AssistService {
         response.setOverallRiskLevel(finalHighestRiskLevel);
         response.setRecommendation(recommendation.getMessage());
         response.setSubmittedAt(result.getDateTaken());
+        response.setInjectionResult(injectionResult); // Thêm injection result
 
         if (finalHighestRiskLevel == RiskLevel.MEDIUM) {
             List<RecommendationCourse> recCourses = recommendationCourseRepository
@@ -286,5 +335,127 @@ public class AssistService {
             recommendationCourse.setCourse(course);
             recommendationCourseRepository.save(recommendationCourse);
         }
+    }
+
+    // API xem kết quả ASSIST theo ID
+    public AssistResultResponse getAssistResult(Long assessmentResultId) {
+        User currentUser = assessmentService.getCurrentUser();
+
+        AssessmentResult result = resultRepository.findById(assessmentResultId)
+            .orElseThrow(() -> new BadRequestException("Assessment result not found: " + assessmentResultId));
+
+        // Kiểm tra quyền access (chỉ owner hoặc admin/consultant)
+        if (!result.getAssessment().getMember().getId().equals(currentUser.getId()) &&
+            !currentUser.getRole().name().equals("ADMIN") &&
+            !currentUser.getRole().name().equals("CONSULTANT")) {
+            throw new BadRequestException("Access denied to this assessment result");
+        }
+
+        // Kiểm tra type là ASSIST
+        if (!result.getAssessment().getType().equals(AssessmentType.ASSIST)) {
+            throw new BadRequestException("This is not an ASSIST assessment result");
+        }
+
+        return buildAssistResultResponse(result);
+    }
+
+
+
+    // Helper method để build AssistResultResponse từ AssessmentResult
+    private AssistResultResponse buildAssistResultResponse(AssessmentResult result) {
+        // Lấy tất cả user answers cho result này
+        List<UserAssessmentAnswer> userAnswers = result.getUserAnswers();
+
+        // Group answers by substance
+        Map<Substance, List<UserAssessmentAnswer>> answersBySubstance = userAnswers.stream()
+            .filter(ua -> ua.getSubstance() != null)
+            .collect(Collectors.groupingBy(UserAssessmentAnswer::getSubstance));
+
+        // Build substance results
+        List<AssistResultResponse.SubstanceResult> substanceResults = new ArrayList<>();
+        AssistResultResponse.InjectionResult injectionResult = null;
+
+        for (Map.Entry<Substance, List<UserAssessmentAnswer>> entry : answersBySubstance.entrySet()) {
+            Substance substance = entry.getKey();
+            List<UserAssessmentAnswer> substanceAnswers = entry.getValue();
+
+            // Calculate substance score và build question answers
+            int substanceScore = 0;
+            List<AssistResultResponse.QuestionAnswer> questionAnswers = new ArrayList<>();
+
+            for (UserAssessmentAnswer userAnswer : substanceAnswers) {
+                AssessmentQuestion question = userAnswer.getQuestion();
+                AssessmentAnswer answer = userAnswer.getAnswer();
+
+                // Handle Q8 injection question
+                if (question.getQuestionOrder() == 8 && injectionResult == null) {
+                    injectionResult = new AssistResultResponse.InjectionResult();
+                    injectionResult.setQuestionText(question.getQuestionText());
+                    injectionResult.setAnswerText(answer.getAnswerText());
+                    injectionResult.setScore(Optional.ofNullable(answer.getScore()).orElse(0));
+
+                    if (injectionResult.getScore() > 0) {
+                        injectionResult.setRiskAssessment("Injection risk detected - Substance use by injection increases health risks significantly");
+                    } else {
+                        injectionResult.setRiskAssessment("No injection risk detected");
+                    }
+                }
+
+                // Add to substance score (exclude Q8)
+                int answerScore = Optional.ofNullable(answer.getScore()).orElse(0);
+                if (question.getQuestionOrder() != 8) {
+                    substanceScore += answerScore;
+                }
+
+                // Build question answer
+                AssistResultResponse.QuestionAnswer qa = new AssistResultResponse.QuestionAnswer();
+                String questionText = question.getQuestionText();
+                if (question.getQuestionOrder() != 8) {
+                    questionText = questionText.replace("[SUBSTANCE]", substance.getName());
+                }
+                qa.setQuestionText(questionText);
+                qa.setAnswerText(answer.getAnswerText());
+                qa.setScore(answerScore);
+                questionAnswers.add(qa);
+            }
+
+            // Build substance result
+            AssistResultResponse.SubstanceResult substanceResult = new AssistResultResponse.SubstanceResult();
+            substanceResult.setSubstanceId(substance.getId());
+            substanceResult.setSubstanceName(substance.getName());
+            substanceResult.setSubstanceDescription(substance.getDescription());
+            substanceResult.setScore(substanceScore);
+            substanceResult.setRiskLevel(determineSubstanceRiskLevel(substance.getName(), substanceScore));
+            substanceResult.setCriteria(getRiskCriteria(substance.getName()));
+            substanceResult.setAnswers(questionAnswers);
+
+            substanceResults.add(substanceResult);
+        }
+
+        // Get course recommendations
+        List<RecommendationCourse> recCourses = recommendationCourseRepository
+            .findByIdAssessmentResultId(result.getId());
+        List<AssistResultResponse.CourseDTO> courseDTOs = recCourses.stream().map(rc -> {
+            Course course = rc.getCourse();
+            AssistResultResponse.CourseDTO dto = new AssistResultResponse.CourseDTO();
+            dto.setId(course.getId());
+            dto.setName(course.getName());
+            dto.setDescription(course.getDescription());
+            dto.setTargetAgeGroup(course.getTargetAgeGroup().name());
+            return dto;
+        }).toList();
+
+        // Build response
+        AssistResultResponse response = new AssistResultResponse();
+        response.setAssessmentResultId(result.getId());
+        response.setAssessmentId(result.getAssessment().getId());
+        response.setSubstanceResults(substanceResults);
+        response.setOverallRiskLevel(result.getRiskLevel());
+        response.setRecommendation(result.getRecommendation().getMessage());
+        response.setSubmittedAt(result.getDateTaken());
+        response.setInjectionResult(injectionResult);
+        response.setRecommendedCourses(courseDTOs);
+
+        return response;
     }
 }

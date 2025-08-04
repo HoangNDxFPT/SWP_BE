@@ -93,4 +93,11 @@ public class AssessmentController {
         AssistResultResponse response = assistService.submitAssistAssessment(assistRequest);
         return ResponseEntity.ok(response);
     }
+
+    // Xem kết quả ASSIST assessment theo ID
+    @GetMapping("/assist-result/{assessmentResultId}")
+    public ResponseEntity<AssistResultResponse> getAssistResult(@PathVariable Long assessmentResultId) {
+        AssistResultResponse response = assistService.getAssistResult(assessmentResultId);
+        return ResponseEntity.ok(response);
+    }
 }

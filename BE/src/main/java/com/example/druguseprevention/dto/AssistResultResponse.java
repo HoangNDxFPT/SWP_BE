@@ -14,6 +14,7 @@ public class AssistResultResponse {
     private String recommendation;
     private java.time.LocalDateTime submittedAt;
     private List<CourseDTO> recommendedCourses;
+    private InjectionResult injectionResult; // Kết quả riêng cho câu injection
 
     @Data
     public static class SubstanceResult {
@@ -39,5 +40,13 @@ public class AssistResultResponse {
         private String name;
         private String description;
         private String targetAgeGroup;
+    }
+
+    @Data
+    public static class InjectionResult {
+        private String questionText;
+        private String answerText;
+        private int score;
+        private String riskAssessment; // "No injection risk" hoặc "Injection risk detected"
     }
 }
