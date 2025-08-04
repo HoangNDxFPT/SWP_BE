@@ -27,6 +27,10 @@ public class AssessmentResultResponse {
         private Long answerId;
         private String answerText;
         private Integer score;
+        // Thêm thông tin substance
+        private Long substanceId;
+        private String substanceName;
+        private String substanceDescription;
     }
 
     @Data

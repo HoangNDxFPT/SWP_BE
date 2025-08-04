@@ -7,7 +7,6 @@ import com.example.druguseprevention.enums.SurveyType;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -42,7 +41,6 @@ public class SurveyMailService {
             }
         }
 
-        // Tìm template theo chương trình và loại
         SurveyTemplate template = surveyTemplateRepository.findByProgramIdAndTypeAndIsDeletedFalse(programId, type)
                 .orElseThrow(() -> new BadRequestException("Survey template not found for this program and type"));
 
@@ -50,6 +48,14 @@ public class SurveyMailService {
 
         for (ProgramParticipation p : participations) {
             User user = p.getMember();
+
+            // Check if survey has already been sent to this user for this program and type
+            boolean alreadySent = surveySendHistoryRepository.existsByUserIdAndProgramIdAndTemplateTypeAndStatus(
+                    user.getId(), programId, type, SurveySendStatus.SENT);
+
+            if (alreadySent) {
+                continue;
+            }
 
             EmailDetail emailDetail = new EmailDetail();
             emailDetail.setRecipient(user.getEmail());
@@ -80,6 +86,4 @@ public class SurveyMailService {
             surveySendHistoryRepository.save(history);
         }
     }
-
 }
-

@@ -3,11 +3,15 @@ package com.example.druguseprevention.controller;
 import com.example.druguseprevention.dto.AssessmentResultResponse;
 import com.example.druguseprevention.dto.AssessmentStartResponse;
 import com.example.druguseprevention.dto.AssessmentSubmissionRequest;
+import com.example.druguseprevention.dto.AssistSubmissionRequest;
+import com.example.druguseprevention.dto.AssistResultResponse;
+import com.example.druguseprevention.dto.AssistStartResponse;
 import com.example.druguseprevention.entity.Assessment;
 import com.example.druguseprevention.entity.AssessmentQuestion;
 import com.example.druguseprevention.entity.AssessmentResult;
 import com.example.druguseprevention.enums.AssessmentType;
 import com.example.druguseprevention.service.AssessmentService;
+import com.example.druguseprevention.service.AssistService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +28,7 @@ import java.util.List;
 public class AssessmentController {
 
     private final AssessmentService assessmentService;
+    private final AssistService assistService;
 
 
 
@@ -37,6 +42,12 @@ public class AssessmentController {
     @PostMapping("/start")
     public ResponseEntity<AssessmentStartResponse> startAssessment(@RequestParam AssessmentType type) {
         return ResponseEntity.ok(assessmentService.startAssessment(type));
+    }
+
+    @PostMapping("/start-assist")
+    public ResponseEntity<AssistStartResponse> startAssistAssessment() {
+        AssistStartResponse response = assistService.startAssistAssessment();
+        return ResponseEntity.ok(response);
     }
 
     //  Lấy bài đánh giá gần nhất của người dùng hiện tại
@@ -72,6 +83,14 @@ public class AssessmentController {
             @RequestBody List<AssessmentSubmissionRequest> submissionRequests) {
 
         AssessmentResultResponse response = assessmentService.submit(type, submissionRequests);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/submit-assist")
+    public ResponseEntity<AssistResultResponse> submitAssistAssessment(
+            @RequestBody AssistSubmissionRequest assistRequest) {
+
+        AssistResultResponse response = assistService.submitAssistAssessment(assistRequest);
         return ResponseEntity.ok(response);
     }
 }

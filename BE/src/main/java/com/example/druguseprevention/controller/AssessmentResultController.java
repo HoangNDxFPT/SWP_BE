@@ -1,6 +1,5 @@
 package com.example.druguseprevention.controller;
 
-import com.example.druguseprevention.dto.AssessmentResultResponse;
 import com.example.druguseprevention.entity.User;
 import com.example.druguseprevention.service.AssessmentResultService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/assessment-results")
@@ -24,25 +24,34 @@ public class AssessmentResultController {
 
     private final AssessmentResultService assessmentResultService;
 
-    @PreAuthorize("hasRole('ADMIN') or hasRole('CONSULTANT')")
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<AssessmentResultResponse>> getResultsByUserId(@PathVariable Long userId) {
-        List<AssessmentResultResponse> responses = assessmentResultService.getResultsByUserId(userId);
-        return ResponseEntity.ok(responses);
-    }
-
+    // =============== Main Endpoints - Simplified ===============
 
     @GetMapping("/{resultId}")
-    public ResponseEntity<AssessmentResultResponse> getResultById(@PathVariable Long resultId) {
-        AssessmentResultResponse response = assessmentResultService.getResultById(resultId);
+    public ResponseEntity<Map<String, Object>> getCompleteResult(@PathVariable Long resultId) {
+        Map<String, Object> response = assessmentResultService.getCompleteResult(resultId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/me")
-    public ResponseEntity<List<AssessmentResultResponse>> getMyAssessmentHistory(
+    public ResponseEntity<List<Map<String, Object>>> getMyResults(
             @AuthenticationPrincipal User currentUser) {
         Long userId = currentUser.getId();
-        List<AssessmentResultResponse> responses = assessmentResultService.getResultsByUserId(userId);
+        List<Map<String, Object>> responses = assessmentResultService.getMyResults(userId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/me/latest")
+    public ResponseEntity<Map<String, Object>> getMyLatestResult(
+            @AuthenticationPrincipal User currentUser) {
+        Long userId = currentUser.getId();
+        Map<String, Object> response = assessmentResultService.getMyLatestResult(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('CONSULTANT')")
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Map<String, Object>>> getUserResults(@PathVariable Long userId) {
+        List<Map<String, Object>> responses = assessmentResultService.getMyResults(userId);
         return ResponseEntity.ok(responses);
     }
 }
