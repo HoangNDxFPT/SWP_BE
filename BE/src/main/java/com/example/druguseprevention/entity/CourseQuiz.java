@@ -22,5 +22,6 @@ public class CourseQuiz {
 
     @Column(columnDefinition = "json")
     private String answer; // JSON string (e.g., ["A", "B", "C", "D"])
+
     private Integer correct; // index đáp án đúng (0-based)
 }

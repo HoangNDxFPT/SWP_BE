@@ -6,7 +6,6 @@ import com.example.druguseprevention.dto.AssessmentSubmissionRequest;
 import com.example.druguseprevention.entity.Assessment;
 import com.example.druguseprevention.entity.AssessmentQuestion;
 import com.example.druguseprevention.entity.AssessmentResult;
-import com.example.druguseprevention.entity.Substance;
 import com.example.druguseprevention.enums.AssessmentType;
 import com.example.druguseprevention.service.AssessmentService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -73,27 +72,6 @@ public class AssessmentController {
             @RequestBody List<AssessmentSubmissionRequest> submissionRequests) {
 
         AssessmentResultResponse response = assessmentService.submit(type, submissionRequests);
-        return ResponseEntity.ok(response);
-    }
-
-    // Lấy danh sách substances cho ASSIST
-    @GetMapping("/assist/substances")
-    public ResponseEntity<List<Substance>> getAssistSubstances() {
-        List<Substance> substances = assessmentService.getAssistSubstances();
-        return ResponseEntity.ok(substances);
-    }
-
-    // Bắt đầu bài ASSIST cho substance cụ thể
-    @PostMapping("/assist/start-for-substance")
-    public ResponseEntity<AssessmentStartResponse> startAssistForSubstance(@RequestParam Long substanceId) {
-        AssessmentStartResponse response = assessmentService.startAssistForSubstance(substanceId);
-        return ResponseEntity.ok(response);
-    }
-
-    // Bắt đầu bài ASSIST cho nhiều substances (NEW)
-    @PostMapping("/assist/start-for-multiple-substances")
-    public ResponseEntity<AssessmentStartResponse> startAssistForMultipleSubstances(@RequestBody List<Long> substanceIds) {
-        AssessmentStartResponse response = assessmentService.startAssistForMultipleSubstances(substanceIds);
         return ResponseEntity.ok(response);
     }
 }

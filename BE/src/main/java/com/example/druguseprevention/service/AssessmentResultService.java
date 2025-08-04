@@ -4,6 +4,7 @@ import com.example.druguseprevention.dto.AssessmentResultResponse;
 import com.example.druguseprevention.entity.AssessmentResult;
 import com.example.druguseprevention.exception.exceptions.BadRequestException;
 import com.example.druguseprevention.repository.AssessmentResultRepository;
+import javassist.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
