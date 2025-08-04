@@ -257,7 +257,7 @@ public class AssistService {
             else if (score <= 26) return RiskLevel.MEDIUM;
             else return RiskLevel.HIGH;
         } else {
-            // Các chất khác dùng thang điểm chuẩn
+            // Các chất khác dùng thang điểm chuẩnn
             if (score <= 3) return RiskLevel.LOW;
             else if (score <= 26) return RiskLevel.MEDIUM;
             else return RiskLevel.HIGH;
