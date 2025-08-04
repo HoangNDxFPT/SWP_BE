@@ -31,6 +31,17 @@ public class SurveyMailService {
         Program program = programRepository.findByIdAndIsDeletedFalse(programId)
                 .orElseThrow(() -> new BadRequestException("Program not found"));
 
+        if (type == SurveyType.POST) {
+            long preSurveyCount = surveySendHistoryRepository.countSentSurveysByProgramAndType(
+                    programId, SurveyType.PRE);
+
+            if (preSurveyCount == 0) {
+                throw new BadRequestException(
+                        "Cannot send post-survey because no pre-survey has been sent for this program"
+                );
+            }
+        }
+
         // Tìm template theo chương trình và loại
         SurveyTemplate template = surveyTemplateRepository.findByProgramIdAndTypeAndIsDeletedFalse(programId, type)
                 .orElseThrow(() -> new BadRequestException("Survey template not found for this program and type"));
